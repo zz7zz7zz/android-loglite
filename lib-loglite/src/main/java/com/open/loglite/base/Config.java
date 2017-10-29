@@ -58,7 +58,7 @@ public class Config {
     public boolean isEnable = false; //是否开启了日志
     public int logMode      = 1;    //打印日志的方式
     public int logLevel     = 0;   //哪些等级可以输出
-    public int compareType = COMPARE_EQ;
+    public int compareType = COMPARE_TYPE_EQ;
     public String[] logAuthor   ;    //哪些作者的日志可以输出,支持64个作者
     public HashMap<String,Boolean> logAuthorMap;
     public String[] authorGroup;//有哪些作者

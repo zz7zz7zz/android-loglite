@@ -13,19 +13,22 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         Logger.init(this,"log.config");
-        Logger.v("A","MainActivity","onCreate");
-//        log();
+        Logger.v("A",TAG,"onCreate");
+
+        log();
     }
 
     public void log(){
         StringBuilder sb = new StringBuilder(5000);
-        for (int i = 1; i < 501; i++) {
+        for (int i = 1; i < 502; i++) {
             sb.append(String.format("%010d",i));
         }
         String str= sb.toString();
         int len = Log.v(TAG,str);
-        Log.v(TAG,"---- len " + len);
-        System.out.println("---- len " + len);
-        System.out.println(str);
+//        Log.v(TAG,"---- len " + len);
+//        System.out.println("---- len " + len);
+//        System.out.println(str);
+
+        Logger.v("A",TAG,str);
     }
 }

@@ -29,8 +29,8 @@ public final class Logger{
     public static void init(Context mContext, String assetFileName){
         mLogConfig = CfgParser.parse(mContext,assetFileName);
 System.out.println(mLogConfig);
-        if(mLogConfig.isEnable){
-            if(null != mLogConfig){
+        if(null != mLogConfig){
+            if(mLogConfig.isEnable) {
                 mLogger = new Logger();
 
                 if((mLogConfig.logMode & Config.LOG_MODE_CONSOLE) == Config.LOG_MODE_CONSOLE){
@@ -44,8 +44,10 @@ System.out.println(mLogConfig);
                 if((mLogConfig.logMode & Config.LOG_MODE_NET) == Config.LOG_MODE_NET){
                     mLogger.addLogger(new NetLogger());
                 }
+            }else{
+                destroy();
             }
-        }else{
+        } else{
             destroy();
         }
     }
