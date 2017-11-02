@@ -63,6 +63,14 @@ public final class Logger{
         if(null == mLogger || null == mLogConfig|| !mLogConfig.isPermit(author,Config.LOG_LEVEL_VERBOSE)){
             return;
         }
+
+        if(mLogConfig.isCanFormatTag()){
+            String [] names = new String[4];
+            if(fillTraceNames(names)){
+                tag = mLogConfig.formatTag(tag,names);
+            }
+        }
+
         int size = mLogger.loggerArray.size();
         for (int i = 0; i < size; i++) {
             mLogger.loggerArray.get(i).v(Config.LOG_LEVEL_VERBOSE,tag,kv);
@@ -73,6 +81,14 @@ public final class Logger{
         if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author,Config.LOG_LEVEL_DEBUG)){
             return;
         }
+
+        if(mLogConfig.isCanFormatTag()){
+            String [] names = new String[4];
+            if(fillTraceNames(names)){
+                tag = mLogConfig.formatTag(tag,names);
+            }
+        }
+
         int size = mLogger.loggerArray.size();
         for (int i = 0; i < size; i++) {
             mLogger.loggerArray.get(i).d(Config.LOG_LEVEL_DEBUG,tag,kv);
@@ -83,6 +99,14 @@ public final class Logger{
         if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author,Config.LOG_LEVEL_INFO)){
             return;
         }
+
+        if(mLogConfig.isCanFormatTag()){
+            String [] names = new String[4];
+            if(fillTraceNames(names)){
+                tag = mLogConfig.formatTag(tag,names);
+            }
+        }
+
         int size = mLogger.loggerArray.size();
         for (int i = 0; i < size; i++) {
             mLogger.loggerArray.get(i).i(Config.LOG_LEVEL_INFO,tag,kv);
@@ -93,6 +117,14 @@ public final class Logger{
         if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author,Config.LOG_LEVEL_WARN)){
             return;
         }
+
+        if(mLogConfig.isCanFormatTag()){
+            String [] names = new String[4];
+            if(fillTraceNames(names)){
+                tag = mLogConfig.formatTag(tag,names);
+            }
+        }
+
         int size = mLogger.loggerArray.size();
         for (int i = 0; i < size; i++) {
             mLogger.loggerArray.get(i).w(Config.LOG_LEVEL_WARN,tag,kv);
@@ -103,10 +135,44 @@ public final class Logger{
         if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author,Config.LOG_LEVEL_ERROR)){
             return;
         }
+
+        if(mLogConfig.isCanFormatTag()){
+            String [] names = new String[4];
+            if(fillTraceNames(names)){
+                tag = mLogConfig.formatTag(tag,names);
+            }
+        }
+
         int size = mLogger.loggerArray.size();
         for (int i = 0; i < size; i++) {
             mLogger.loggerArray.get(i).e(Config.LOG_LEVEL_ERROR,tag,kv);
         }
     }
 
+    private static boolean fillTraceNames(String[] names){
+        StackTraceElement[] sts = Thread.currentThread().getStackTrace();
+        if (sts != null) {
+            for (StackTraceElement st:sts) {
+                if (st.isNativeMethod()) {
+                    continue;
+                }
+
+                if (st.getClassName().equals(Thread.class.getName())) {
+                    continue;
+                }
+
+                if (st.getClassName().equals(Logger.class.getName())) {
+                    continue;
+                }
+
+                names[0] = st.getFileName();
+                names[1] = st.getClassName();
+                names[2] = st.getMethodName()+"()";
+                names[3] = ""+st.getLineNumber();
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

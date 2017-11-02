@@ -26,6 +26,17 @@ public class Config {
     public static final int COMPARE_TYPE_EQ = 2;//等于
     public static final int COMPARE_TYPE_LT = 3;//小于
 
+    public static final String __FILE__     = "__FILE__";
+    public static final String __CLASS__    = "__CLASS__";
+    public static final String __FUNCTION__ = "__FUNCTION__";
+    public static final String __LINE__     = "__LINE__";
+    public static final String __TAG__      = "__TAG__";
+
+    public static final int FLAG__FILE__    = 0X0001;
+    public static final int FLAG__CLASS__   = 0X0002;
+    public static final int FLAG__FUNCTION__= 0X0004;
+    public static final int FLAG__LINE__    = 0X0008;
+    public static final int FLAG__TAG__     = 0X0010;
 
     /*
     logConfig.txt 样式如下：
@@ -44,7 +55,7 @@ public class Config {
     logLevel = 2                                    #取值有>2;<2;=2 ;     另外2:v日志; 3:d日志;  4:I日志;  5:w日志;  6:e日志
     logAuthor= A|B                                  #代表AB两个人,默认值为全部
     authorGroup=[A,B,C,D,E]                         #A,B,C,D,E 代表5个人
-    logFormater = "%file %line %class %method %msg" # %file文件名 %line文件行数 %class类名 %method方法名
+    logFormater = "__FILE__  __CLASS__ __FUNCTION__ __LINE__ __TAG__ " # %__FILE__文件名  %__CLASS__类名 %__FUNCTION__方法名 %__LINE__文件行数 __TAG__TAG
 
     [File]
     fileNameFormater="yyyy-MM-dd"                   #文件名格式化
@@ -65,6 +76,7 @@ public class Config {
     public HashMap<String,Boolean> logAuthorMap;
     public String[] authorGroup;//有哪些作者
     public String logFormater;//日志需要格式化成什么样的
+    public int formatFlag ;
 
     //-----------fileConfig----------
     public String fileNameFormater;//命名规则
@@ -127,6 +139,22 @@ public class Config {
                 logLevel = Integer.valueOf(_logLevel.substring(0));
             }
             logFormater     = CfgParser.getString(map,"Common","logFormater");
+            if(logFormater.contains(__FILE__)){
+                formatFlag |= FLAG__FILE__;
+            }
+            if(logFormater.contains(__CLASS__)){
+                formatFlag |= FLAG__CLASS__;
+            }
+            if(logFormater.contains(__FUNCTION__)){
+                formatFlag |= FLAG__FUNCTION__;
+            }
+            if(logFormater.contains(__LINE__)){
+                formatFlag |= FLAG__LINE__;
+            }
+            if(logFormater.contains(__TAG__)){
+                formatFlag |= FLAG__TAG__;
+            }
+
             logAuthor       = CfgParser.getStringArray(map,"Common","logAuthor");
             authorGroup     = CfgParser.getStringArray(map,"Common","authorGroup");
             if(null != logAuthor && logAuthor.length>0){
@@ -183,6 +211,35 @@ public class Config {
             return level == logLevel;
         }
         return level == logLevel;
+    }
+
+    public boolean isCanFormatTag(){
+        return formatFlag > 0;
+    }
+
+    public String formatTag(final String tag , String [] names){
+        String ret = logFormater;
+        if((formatFlag & FLAG__FILE__) == FLAG__FILE__){
+            ret = ret.replaceFirst(__FILE__,names[0]);
+        }
+
+        if((formatFlag & FLAG__CLASS__) == FLAG__CLASS__){
+            ret = ret.replaceFirst(__CLASS__,names[1]);
+        }
+
+        if((formatFlag & FLAG__FUNCTION__) == FLAG__FUNCTION__){
+            ret = ret.replaceFirst(__FUNCTION__,names[2]);
+        }
+
+        if((formatFlag & FLAG__LINE__) == FLAG__LINE__){
+            ret = ret.replaceFirst(__LINE__,names[3]);
+        }
+
+        if((formatFlag & FLAG__TAG__) == FLAG__TAG__){
+            ret = ret.replaceFirst(__TAG__,tag);
+        }
+
+        return ret;
     }
 
     @Override
