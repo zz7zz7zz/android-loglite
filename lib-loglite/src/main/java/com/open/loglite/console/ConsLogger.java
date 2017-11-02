@@ -12,7 +12,34 @@ import com.open.loglite.base.ILog;
 public final class ConsLogger implements ILog {
 
 
-    public static final int LOGGER_ENTRY_MAX_LEN    =    (4*1024);//The message may have been truncated by the kernel log driver if msg's length is bigger than LOGGER_ENTRY_MAX_LEN.
+    @Override
+    public void v(int priority, String tag, String... kv) {
+        print(priority,tag,kv);
+    }
+
+    @Override
+    public void d(int priority, String tag, String... kv) {
+        print(priority,tag,kv);
+    }
+
+    @Override
+    public void i(int priority, String tag, String... kv) {
+        print(priority,tag,kv);
+    }
+
+    @Override
+    public void w(int priority, String tag, String... kv) {
+        print(priority,tag,kv);
+    }
+
+    @Override
+    public void e(int priority, String tag, String... kv) {
+        print(priority,tag,kv);
+    }
+
+    //------------------------------------------------------------
+    //The message may have been truncated by the kernel log driver if msg's length is bigger than LOGGER_ENTRY_MAX_LEN.
+    public static final int LOGGER_ENTRY_MAX_LEN    =    (4*1024);
     public static final int LOGGER_ENTRY_MAX_LEN_FIX= LOGGER_ENTRY_MAX_LEN / 4;
 
     public static final int LOG_SYSTEM = 1;
@@ -104,29 +131,5 @@ public final class ConsLogger implements ILog {
         }
     }
 
-
-    @Override
-    public void v(int priority, String tag, String... kv) {
-        print(priority,tag,kv);
-    }
-
-    @Override
-    public void d(int priority, String tag, String... kv) {
-        print(priority,tag,kv);
-    }
-
-    @Override
-    public void i(int priority, String tag, String... kv) {
-        print(priority,tag,kv);
-    }
-
-    @Override
-    public void w(int priority, String tag, String... kv) {
-        print(priority,tag,kv);
-    }
-
-    @Override
-    public void e(int priority, String tag, String... kv) {
-        print(priority,tag,kv);
-    }
+    //------------------------------------------------------------
 }

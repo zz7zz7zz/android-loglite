@@ -11,26 +11,37 @@ public final class FileLogger implements ILog {
 
     @Override
     public void v(int priority, String tag, String... kv) {
-
+        print(tag,kv);
     }
 
     @Override
     public void d(int priority, String tag, String... kv) {
-
+        print(tag,kv);
     }
 
     @Override
     public void i(int priority, String tag, String... kv) {
-
+        print(tag,kv);
     }
 
     @Override
     public void w(int priority, String tag, String... kv) {
-
+        print(tag,kv);
     }
 
     @Override
     public void e(int priority, String tag, String... kv) {
+        print(tag,kv);
+    }
+
+    //------------------------------------------------------------
+    private void print(String tag, String... kv){
 
     }
+
+    private void print(int priority , String tag , String msg){
+
+    }
+
+    //------------------------------------------------------------
 }
