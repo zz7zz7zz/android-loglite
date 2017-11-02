@@ -12,7 +12,7 @@ import com.open.loglite.base.ILog;
 public final class ConsLogger implements ILog {
 
 
-    public static final int LOGGER_ENTRY_MAX_LEN    =    (4*1000);//The message may have been truncated by the kernel log driver if msg's length is bigger than LOGGER_ENTRY_MAX_LEN.
+    public static final int LOGGER_ENTRY_MAX_LEN    =    (4*1024);//The message may have been truncated by the kernel log driver if msg's length is bigger than LOGGER_ENTRY_MAX_LEN.
     public static final int LOGGER_ENTRY_MAX_LEN_FIX= LOGGER_ENTRY_MAX_LEN / 4;
 
     public static final int LOG_SYSTEM = 1;
