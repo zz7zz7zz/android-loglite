@@ -20,18 +20,7 @@ public final class ConsLogger implements ILog {
 
     public int log_type = LOG_LOG;
 
-    private void print(String msg){
-        if((log_type & LOG_SYSTEM) == LOG_SYSTEM){
-            System.out.println(msg);
-        }
-
-        if((log_type & LOG_LOG) == LOG_LOG){
-            Log.v("ConsLogger",msg);
-        }
-    }
-
-    @Override
-    public void v(String... kv) {
+    private void print(int priority,String tag, String... kv){
         String msg;
         if(kv.length>1){
             StringBuilder sb = new StringBuilder(128);
@@ -46,40 +35,70 @@ public final class ConsLogger implements ILog {
         if(msg.length()>LOGGER_ENTRY_MAX_LEN_FIX){
             int count = msg.length() % LOGGER_ENTRY_MAX_LEN_FIX == 0 ?  msg.length()/LOGGER_ENTRY_MAX_LEN_FIX : (msg.length()/LOGGER_ENTRY_MAX_LEN_FIX + 1);
             char[] logCharArray = new char[LOGGER_ENTRY_MAX_LEN_FIX];
-            int i = 0;
+            int i ;
             for(i = 1;i< count;i++){
                 msg.getChars((i-1)*LOGGER_ENTRY_MAX_LEN_FIX,i*LOGGER_ENTRY_MAX_LEN_FIX,logCharArray,0);
 
                 String str = new String(logCharArray,0,(i*LOGGER_ENTRY_MAX_LEN_FIX)- (i-1)*LOGGER_ENTRY_MAX_LEN_FIX);
-                print(str);
+                print(priority,tag,str);
             }
 
             msg.getChars((i-1)*LOGGER_ENTRY_MAX_LEN_FIX,msg.length(),logCharArray,0);
             String str = new String(logCharArray,0,msg.length()- (i-1)*LOGGER_ENTRY_MAX_LEN_FIX);
-            print(str);
+            print(priority,tag,str);
 
         }else{
-            print(msg);
+            print(priority,tag,msg);
         }
     }
 
-    @Override
-    public void d(String... kv) {
+    private void print(int priority , String tag , String msg){
+        if((log_type & LOG_SYSTEM) == LOG_SYSTEM){
+            System.out.println(msg);
+        }
 
+        if((log_type & LOG_LOG) == LOG_LOG){
+            Log.println(priority,tag,msg);
+
+/*            if(priority == Config.LOG_LEVEL_VERBOSE){
+                Log.v(tag,msg);
+            }else if(priority == Config.LOG_LEVEL_DEBUG){
+                Log.d(tag,msg);
+            }else if(priority == Config.LOG_LEVEL_INFO){
+                Log.i(tag,msg);
+            }else if(priority == Config.LOG_LEVEL_WARN){
+                Log.w(tag,msg);
+            }else if(priority == Config.LOG_LEVEL_ERROR){
+                Log.e(tag,msg);
+            }
+*/
+
+        }
+    }
+
+
+    @Override
+    public void v(int priority, String tag, String... kv) {
+        print(priority,tag,kv);
     }
 
     @Override
-    public void i(String... kv) {
-
+    public void d(int priority, String tag, String... kv) {
+        print(priority,tag,kv);
     }
 
     @Override
-    public void w(String... kv) {
-
+    public void i(int priority, String tag, String... kv) {
+        print(priority,tag,kv);
     }
 
     @Override
-    public void e(String... kv) {
+    public void w(int priority, String tag, String... kv) {
+        print(priority,tag,kv);
+    }
 
+    @Override
+    public void e(int priority, String tag, String... kv) {
+        print(priority,tag,kv);
     }
 }

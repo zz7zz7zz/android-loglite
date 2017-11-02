@@ -17,14 +17,9 @@ import java.util.regex.Pattern;
 
 public final class CfgParser {
 
-    public static Config parse(Context mContext , String assetFileName) {
-        HashMap<String,Object> ret = parseToMap(mContext,assetFileName);
-        Config mLogConfig = new Config();
-        mLogConfig.init(ret);
-        return mLogConfig;
-    }
+    //----------------------------------------------------------------
 
-    private static HashMap<String,Object> parseToMap(Context mContext , String assetFileName) {
+    public static HashMap<String,Object> parseToMap(Context mContext , String assetFileName) {
         HashMap<String,Object> ret = null;
         try {
             ret = parseToMap(mContext.getAssets().open(assetFileName));
@@ -101,6 +96,7 @@ System.out.println("-----------------------end----------------------------||"+re
         return ret;
     }
 
+    //----------------------------------------------------------------
 
     public static boolean getBoolean(final HashMap<String,Object> map , final String ... key){
         String val = null;

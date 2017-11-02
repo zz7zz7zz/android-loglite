@@ -2,7 +2,6 @@ package com.open.loglite;
 
 import android.content.Context;
 
-import com.open.loglite.base.CfgParser;
 import com.open.loglite.base.Config;
 import com.open.loglite.base.ILog;
 import com.open.loglite.console.ConsLogger;
@@ -18,17 +17,12 @@ import java.util.ArrayList;
 public final class Logger{
 
     private ArrayList<ILog> loggerArray = new ArrayList<>();
-
-    private void addLogger(ILog logger){
-        loggerArray.add(logger);
-    }
-
     private static Logger mLogger;
     private static Config mLogConfig;
 
-    public static void init(Context mContext, String assetFileName){
-        mLogConfig = CfgParser.parse(mContext,assetFileName);
-System.out.println(mLogConfig);
+    //------------------------------------------
+    public static Config init(Context mContext, String assetFileName){
+        mLogConfig = Config.parse(mContext,assetFileName);
         if(null != mLogConfig){
             if(mLogConfig.isEnable) {
                 mLogger = new Logger();
@@ -50,6 +44,8 @@ System.out.println(mLogConfig);
         } else{
             destroy();
         }
+
+        return mLogConfig;
     }
 
     public static void destroy(){
@@ -58,14 +54,18 @@ System.out.println(mLogConfig);
     }
 
     //------------------------------------------
+    private void addLogger(ILog logger){
+        loggerArray.add(logger);
+    }
+
+    //------------------------------------------
     public static void v(String author , String tag , String... kv) {
         if(null == mLogger || null == mLogConfig|| !mLogConfig.isPermit(author,Config.LOG_LEVEL_VERBOSE)){
             return;
         }
-
         int size = mLogger.loggerArray.size();
         for (int i = 0; i < size; i++) {
-            mLogger.loggerArray.get(i).v(kv);
+            mLogger.loggerArray.get(i).v(Config.LOG_LEVEL_VERBOSE,tag,kv);
         }
     }
 
@@ -75,7 +75,7 @@ System.out.println(mLogConfig);
         }
         int size = mLogger.loggerArray.size();
         for (int i = 0; i < size; i++) {
-            mLogger.loggerArray.get(i).d(kv);
+            mLogger.loggerArray.get(i).d(Config.LOG_LEVEL_DEBUG,tag,kv);
         }
     }
 
@@ -85,7 +85,7 @@ System.out.println(mLogConfig);
         }
         int size = mLogger.loggerArray.size();
         for (int i = 0; i < size; i++) {
-            mLogger.loggerArray.get(i).i(kv);
+            mLogger.loggerArray.get(i).i(Config.LOG_LEVEL_INFO,tag,kv);
         }
     }
 
@@ -95,7 +95,7 @@ System.out.println(mLogConfig);
         }
         int size = mLogger.loggerArray.size();
         for (int i = 0; i < size; i++) {
-            mLogger.loggerArray.get(i).w(kv);
+            mLogger.loggerArray.get(i).w(Config.LOG_LEVEL_WARN,tag,kv);
         }
     }
 
@@ -105,7 +105,7 @@ System.out.println(mLogConfig);
         }
         int size = mLogger.loggerArray.size();
         for (int i = 0; i < size; i++) {
-            mLogger.loggerArray.get(i).e(kv);
+            mLogger.loggerArray.get(i).e(Config.LOG_LEVEL_ERROR,tag,kv);
         }
     }
 

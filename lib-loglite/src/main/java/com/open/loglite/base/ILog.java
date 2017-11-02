@@ -6,14 +6,14 @@ package com.open.loglite.base;
 
 public interface ILog {
 
-    void v(String ... kv);
+    void v(int priority , String tag , String ... kv);
 
-    void d(String ... kv);
+    void d(int priority , String tag , String ... kv);
 
-    void i(String ... kv);
+    void i(int priority , String tag , String ... kv);
 
-    void w(String ... kv);
+    void w(int priority , String tag , String ... kv);
 
-    void e(String ... kv);
+    void e(int priority , String tag , String ... kv);
 
 }

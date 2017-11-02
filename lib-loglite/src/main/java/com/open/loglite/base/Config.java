@@ -1,5 +1,7 @@
 package com.open.loglite.base;
 
+import android.content.Context;
+
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -98,7 +100,14 @@ public class Config {
         }
     }
 
-    public void init(HashMap map){
+    public static Config parse(Context mContext , String assetFileName) {
+        HashMap<String,Object> ret = CfgParser.parseToMap(mContext,assetFileName);
+        Config mLogConfig = new Config();
+        mLogConfig.init(ret);
+        return mLogConfig;
+    }
+
+    private void init(HashMap map){
         if(null != map){
             isEnable        = CfgParser.getBoolean(map,"ENABLE","enable");
 

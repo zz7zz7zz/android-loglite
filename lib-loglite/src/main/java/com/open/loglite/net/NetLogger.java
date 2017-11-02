@@ -9,29 +9,28 @@ import com.open.loglite.base.ILog;
 
 public final class NetLogger implements ILog {
 
-
     @Override
-    public void v(String... kv) {
+    public void v(int priority, String tag, String... kv) {
 
     }
 
     @Override
-    public void d(String... kv) {
+    public void d(int priority, String tag, String... kv) {
 
     }
 
     @Override
-    public void i(String... kv) {
+    public void i(int priority, String tag, String... kv) {
 
     }
 
     @Override
-    public void w(String... kv) {
+    public void w(int priority, String tag, String... kv) {
 
     }
 
     @Override
-    public void e(String... kv) {
+    public void e(int priority, String tag, String... kv) {
 
     }
 }

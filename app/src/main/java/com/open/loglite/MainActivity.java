@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.open.loglite.base.Config;
+
 public class MainActivity extends Activity {
 
     private String TAG = "MainActivity";
@@ -12,7 +14,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Logger.init(this,"log.config");
+        Config mConfig = Logger.init(this,"log.config");
+        System.out.println(mConfig);
         Logger.v("A",TAG,"onCreate");
 
         log();
