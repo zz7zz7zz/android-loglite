@@ -12,7 +12,7 @@ import com.open.loglite.base.ILog;
 public final class ConsLogger implements ILog {
 
 
-    public static final int LOGGER_ENTRY_MAX_LEN    =    (4*1024);//The message may have been truncated by the kernel log driver if msg's length is bigger than LOGGER_ENTRY_MAX_LEN.
+    public static final int LOGGER_ENTRY_MAX_LEN    =    (4*1000);//The message may have been truncated by the kernel log driver if msg's length is bigger than LOGGER_ENTRY_MAX_LEN.
     public static final int LOGGER_ENTRY_MAX_LEN_FIX= LOGGER_ENTRY_MAX_LEN / 4;
 
     public static final int LOG_SYSTEM = 1;
@@ -21,34 +21,62 @@ public final class ConsLogger implements ILog {
     public int log_type = LOG_LOG;
 
     private void print(int priority,String tag, String... kv){
-        String msg;
         if(kv.length>1){
-            StringBuilder sb = new StringBuilder(128);
+            StringBuilder sb = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX);
+            int count = 0;
             for (int i = 0; i < kv.length; i++) {
-                sb.append(kv[i]);
+                if(null == kv[i]){
+                    continue;
+                }
+
+                int length = kv[i].length();
+                //一旦加上这个msg 大于 LOGGER_ENTRY_MAX_LEN_FIX ，1.需要马上打印之前的日志，打印后清空; 2.接着重新填入
+                if((count + length) > LOGGER_ENTRY_MAX_LEN_FIX){
+
+                    //1. 把上次记录先打印
+                    if(sb.length()>0){
+                        print(priority,tag,sb.toString());
+                        sb.delete(0,sb.length());
+                        count = 0;
+                    }
+
+                    //2. 判断本次要打印的记录是否也是大于 LOGGER_ENTRY_MAX_LEN_FIX
+                    if(length>LOGGER_ENTRY_MAX_LEN_FIX){
+                        int page = length % LOGGER_ENTRY_MAX_LEN_FIX == 0 ? length/LOGGER_ENTRY_MAX_LEN_FIX : (length/LOGGER_ENTRY_MAX_LEN_FIX + 1);
+                        for(int j = 1;j< page;j++){
+                            print(priority,tag,kv[i].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
+                        }
+
+                        count += length;
+                        sb.append(kv[i].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
+
+                    }else{
+                        count += length;
+                        sb.append(kv[i]);
+                    }
+
+                }else{
+
+                    count += kv[i].length();
+                    sb.append(kv[i]);
+                }
             }
-            msg = sb.toString();
-        }else{
-            msg = kv[0];
-        }
 
-        if(msg.length()>LOGGER_ENTRY_MAX_LEN_FIX){
-            int count = msg.length() % LOGGER_ENTRY_MAX_LEN_FIX == 0 ?  msg.length()/LOGGER_ENTRY_MAX_LEN_FIX : (msg.length()/LOGGER_ENTRY_MAX_LEN_FIX + 1);
-            char[] logCharArray = new char[LOGGER_ENTRY_MAX_LEN_FIX];
-            int i ;
-            for(i = 1;i< count;i++){
-                msg.getChars((i-1)*LOGGER_ENTRY_MAX_LEN_FIX,i*LOGGER_ENTRY_MAX_LEN_FIX,logCharArray,0);
-
-                String str = new String(logCharArray,0,(i*LOGGER_ENTRY_MAX_LEN_FIX)- (i-1)*LOGGER_ENTRY_MAX_LEN_FIX);
-                print(priority,tag,str);
+            if(sb.length()>0){
+                print(priority,tag,sb.toString());
             }
-
-            msg.getChars((i-1)*LOGGER_ENTRY_MAX_LEN_FIX,msg.length(),logCharArray,0);
-            String str = new String(logCharArray,0,msg.length()- (i-1)*LOGGER_ENTRY_MAX_LEN_FIX);
-            print(priority,tag,str);
-
         }else{
-            print(priority,tag,msg);
+            int length = kv[0].length();
+            if(length>LOGGER_ENTRY_MAX_LEN_FIX){
+                int page = length % LOGGER_ENTRY_MAX_LEN_FIX == 0 ? length/LOGGER_ENTRY_MAX_LEN_FIX : (length/LOGGER_ENTRY_MAX_LEN_FIX + 1);
+                for(int j = 1;j< page;j++){
+                    print(priority,tag,kv[0].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
+                }
+
+                print(priority,tag,kv[0].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
+            }else{
+                print(priority,tag,kv[0]);
+            }
         }
     }
 
