@@ -21,7 +21,7 @@ public final class Logger{
     private static Config mLogConfig;
 
     //------------------------------------------
-    public static Config init(Context mContext, String assetFileName){
+    public static Config init(Context mContext, String assetFileName,String fileLogPath){
         mLogConfig = Config.parse(mContext,assetFileName);
         if(null != mLogConfig){
             if(mLogConfig.isEnable) {
@@ -32,7 +32,7 @@ public final class Logger{
                 }
 
                 if((mLogConfig.logMode & Config.LOG_MODE_FILE) == Config.LOG_MODE_FILE){
-                    mLogger.addLogger(new FileLogger());
+                    mLogger.addLogger(new FileLogger(fileLogPath,mLogConfig.fileNameFormater,mLogConfig.fileSize));
                 }
 
                 if((mLogConfig.logMode & Config.LOG_MODE_NET) == Config.LOG_MODE_NET){

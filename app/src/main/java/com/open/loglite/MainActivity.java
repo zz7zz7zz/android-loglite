@@ -1,25 +1,37 @@
 package com.open.loglite;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.open.loglite.base.Config;
 
+import java.io.File;
+
 public class MainActivity extends Activity {
 
     private String TAG = "MainActivity";
+    static boolean isInited = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Config mConfig = Logger.init(this,"log.config");
-        System.out.println(mConfig);
+        if(!isInited){
+            Config mConfig = Logger.init(this,"log.config",getDiskCacheDir(this));
+            System.out.println(mConfig);
+            isInited = true;
+        }
+        Log.v(TAG,"onCreate--");
         Logger.v("A",TAG,"onCreate");
 
-        log();
+
+//        log();
     }
+
 
     public void log(){
         StringBuilder sb = new StringBuilder(5000);
@@ -33,5 +45,21 @@ public class MainActivity extends Activity {
 //        System.out.println(str);
 
         Logger.v("A",TAG,str);
+    }
+
+
+    public static String getDiskCacheDir(Context mContext) {
+        String cachePath;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            File[] externalFilesDirs = ContextCompat.getExternalFilesDirs(mContext, null);
+            if (externalFilesDirs != null && externalFilesDirs.length > 0 && externalFilesDirs[0] != null) {
+                cachePath = externalFilesDirs[0].getAbsolutePath();
+            } else {
+                cachePath = mContext.getCacheDir().getPath();
+            }
+        } else {
+            cachePath = mContext.getCacheDir().getPath();
+        }
+        return cachePath + File.separator;
     }
 }
