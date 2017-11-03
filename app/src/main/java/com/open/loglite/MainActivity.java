@@ -25,7 +25,13 @@ public class MainActivity extends Activity {
             System.out.println(mConfig);
             isInited = true;
         }
-        Log.v(TAG,"onCreate--");
+        Log.v(TAG,"onCreate--1--"+Thread.currentThread().getId() + " " + Thread.currentThread().getName());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.v(TAG,"onCreate--2--"+Thread.currentThread().getId() + " " + Thread.currentThread().getName());
+            }
+        }).start();
         Logger.v("A",TAG,"onCreate");
 
 

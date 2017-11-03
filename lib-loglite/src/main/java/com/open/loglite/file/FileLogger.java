@@ -140,13 +140,17 @@ public final class FileLogger implements ILog {
 
         try {
             if(null != fw){
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+                String time = sdf.format(new Date());
+                fw.write(time);
+                fw.write(" ");
                 fw.write(priority);
                 fw.write(" ");
                 fw.write(tag);
                 fw.write(" ");
                 fw.write(kv);
                 fw.write(NEW_LINE);
-                writtenedSize += (priority.length()+ 1+ tag.length() + 1 +  kv.length());
+                writtenedSize += (time.length() + 1 +priority.length()+ 1+ tag.length() + 1 +  kv.length());
             }
         } catch (IOException e) {
             e.printStackTrace();
