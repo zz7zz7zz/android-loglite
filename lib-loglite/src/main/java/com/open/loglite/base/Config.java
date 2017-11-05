@@ -223,23 +223,23 @@ public class Config {
     public String formatTag(final String tag , String [] names){
         String ret = logFormater;
         if((formatFlag & FLAG__FILE__) == FLAG__FILE__){
-            ret = ret.replaceFirst(__FILE__,names[0]);
+            ret = ret.replace(__FILE__,names[0]);
         }
 
         if((formatFlag & FLAG__CLASS__) == FLAG__CLASS__){
-            ret = ret.replaceFirst(__CLASS__,names[1]);
+            ret = ret.replace(__CLASS__,names[1]);
         }
 
         if((formatFlag & FLAG__FUNCTION__) == FLAG__FUNCTION__){
-            ret = ret.replaceFirst(__FUNCTION__,names[2]);
+            ret = ret.replace(__FUNCTION__,names[2]);
         }
 
         if((formatFlag & FLAG__LINE__) == FLAG__LINE__){
-            ret = ret.replaceFirst(__LINE__,names[3]);
+            ret = ret.replace(__LINE__,names[3]);
         }
 
         if((formatFlag & FLAG__TAG__) == FLAG__TAG__){
-            ret = ret.replaceFirst(__TAG__,tag);
+            ret = ret.replace(__TAG__,tag);
         }
 
         return ret;
