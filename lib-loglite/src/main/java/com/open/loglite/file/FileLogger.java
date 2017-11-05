@@ -1,5 +1,7 @@
 package com.open.loglite.file;
 
+import android.util.Log;
+
 import com.open.loglite.base.ILog;
 import com.open.loglite.base.LogMessage;
 
@@ -323,7 +325,7 @@ public final class FileLogger implements ILog {
     private ConcurrentLinkedQueue<LogMessage> queen = new ConcurrentLinkedQueue();
 
     //线程池
-    private ThreadPoolExecutor executor = new ThreadPoolExecutor(0,1,60L, TimeUnit.SECONDS,new LinkedBlockingDeque<Runnable>());
+    private ThreadPoolExecutor executor = new ThreadPoolExecutor(0,1,60L, TimeUnit.SECONDS,new LinkedBlockingDeque<Runnable>(1), new ThreadPoolExecutor.DiscardPolicy());
 
 
 
