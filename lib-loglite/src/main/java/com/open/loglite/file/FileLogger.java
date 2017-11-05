@@ -1,12 +1,17 @@
 package com.open.loglite.file;
 
 import com.open.loglite.base.ILog;
+import com.open.loglite.base.LogMessage;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 文件日志
@@ -23,27 +28,132 @@ public final class FileLogger implements ILog {
 
     @Override
     public void v(int priority, String tag, String... kv) {
-        print(LOG_VERBOSE,tag,kv);
+        if(syn){
+            queen.add(new LogMessage(tag,kv));
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if(queen.isEmpty()){
+                        return;
+                    }
+
+                    openFile();
+                    while (!queen.isEmpty()){
+                        LogMessage msg = queen.poll();
+                        print(LOG_VERBOSE,msg.tag,msg.kvs);
+                    }
+                    closeFile();
+                }
+            });
+        }else{
+            openFile();
+            print(LOG_VERBOSE,tag,kv);
+            closeFile();
+        }
     }
 
     @Override
     public void d(int priority, String tag, String... kv) {
-        print(LOG_DEBUG,tag,kv);
+        if(syn){
+            queen.add(new LogMessage(tag,kv));
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if(queen.isEmpty()){
+                        return;
+                    }
+
+                    openFile();
+                    while (!queen.isEmpty()){
+                        LogMessage msg = queen.poll();
+                        print(LOG_DEBUG,msg.tag,msg.kvs);
+                    }
+                    closeFile();
+                }
+            });
+        }else{
+            openFile();
+            print(LOG_DEBUG,tag,kv);
+            closeFile();
+        }
     }
 
     @Override
     public void i(int priority, String tag, String... kv) {
-        print(LOG_INFO,tag,kv);
+        if(syn){
+            queen.add(new LogMessage(tag,kv));
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if(queen.isEmpty()){
+                        return;
+                    }
+
+                    openFile();
+                    while (!queen.isEmpty()){
+                        LogMessage msg = queen.poll();
+                        print(LOG_INFO,msg.tag,msg.kvs);
+                    }
+                    closeFile();
+                }
+            });
+        }else{
+            openFile();
+            print(LOG_INFO,tag,kv);
+            closeFile();
+        }
     }
 
     @Override
     public void w(int priority, String tag, String... kv) {
-        print(LOG_WARN,tag,kv);
+        if(syn){
+            queen.add(new LogMessage(tag,kv));
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if(queen.isEmpty()){
+                        return;
+                    }
+
+                    openFile();
+                    while (!queen.isEmpty()){
+                        LogMessage msg = queen.poll();
+                        print(LOG_WARN,msg.tag,msg.kvs);
+                    }
+                    closeFile();
+                }
+            });
+        }else{
+            openFile();
+            print(LOG_WARN,tag,kv);
+            closeFile();
+        }
     }
 
     @Override
     public void e(int priority, String tag, String... kv) {
-        print(LOG_ERROR,tag,kv);
+        if(syn){
+            queen.add(new LogMessage(tag,kv));
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if(queen.isEmpty()){
+                        return;
+                    }
+
+                    openFile();
+                    while (!queen.isEmpty()){
+                        LogMessage msg = queen.poll();
+                        print(LOG_ERROR,msg.tag,msg.kvs);
+                    }
+                    closeFile();
+                }
+            });
+        }else{
+            openFile();
+            print(LOG_ERROR,tag,kv);
+            closeFile();
+        }
     }
 
     //------------------------------------------------------------
@@ -54,21 +164,20 @@ public final class FileLogger implements ILog {
     public final String logPath;
     public final String fileNameFormater;//命名规则
     public final long fileSize;//每一个文件大小
+    public final boolean syn;//是否是异步写文件
     public int fileNameIndex = 0;
     public long writtenedSize = 0;
     private String writtenFileName;
 
-    public FileLogger(String logPath , String fileNameFormater, long fileSize) {
+    public FileLogger(String logPath , String fileNameFormater, long fileSize , boolean isSyn) {
         this.logPath = logPath;
         this.fileNameFormater = fileNameFormater;
         this.fileSize = fileSize;
+        this.syn = isSyn;
         initFile();
     }
 
     private void print(String priority, String tag, String... kv){
-
-        openFile();
-
         if(kv.length>1){
             StringBuilder sb = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX);
             int count = 0;
@@ -126,8 +235,6 @@ public final class FileLogger implements ILog {
                 write(priority,tag,kv[0]);
             }
         }
-
-        closeFile();
     }
 
     private void write(String priority, String tag, String kv){
@@ -190,7 +297,7 @@ public final class FileLogger implements ILog {
     }
 
     private void openFile(){
-        if(null == writtenFileName){
+        if(null == writtenFileName || null != fw){
             return;
         }
         try {
@@ -212,4 +319,12 @@ public final class FileLogger implements ILog {
     }
 
     //------------------------------------------------------------
+    //无锁队列
+    private ConcurrentLinkedQueue<LogMessage> queen = new ConcurrentLinkedQueue();
+
+    //线程池
+    private ThreadPoolExecutor executor = new ThreadPoolExecutor(0,1,60L, TimeUnit.SECONDS,new LinkedBlockingDeque<Runnable>());
+
+
+
 }

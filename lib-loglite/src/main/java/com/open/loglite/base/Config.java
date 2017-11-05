@@ -60,6 +60,7 @@ public class Config {
     [File]
     fileNameFormater=yyyy-MM-dd_%d                   #文件名格式化2017-1-1_1.txt
     fileSize = 1024                                 #长度单位是byte ，所以1M的长度是1024*1024
+    syn     = true;
 
     [Net]
     tcp=[127.0.0.1:9999,127.0.0.1:9998]             #tcp配置
@@ -81,6 +82,7 @@ public class Config {
     //-----------fileConfig----------
     public String fileNameFormater;//命名规则
     public long fileSize;//每一个文件大小
+    public boolean syn;
 
     //-----------netConfig----------
     public Tcp[] tcpArray;
@@ -166,6 +168,7 @@ public class Config {
 
             fileNameFormater = CfgParser.getString(map,"File","fileNameFormater");
             fileSize         = CfgParser.getLong(map,"File","fileSize");
+            syn              = CfgParser.getBoolean(map,"File","syn");
 
             String val[]     = CfgParser.getStringArray(map,"Net","tcp");
             if(null != val){

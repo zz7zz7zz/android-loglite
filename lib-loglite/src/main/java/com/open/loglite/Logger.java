@@ -32,7 +32,7 @@ public final class Logger{
                 }
 
                 if((mLogConfig.logMode & Config.LOG_MODE_FILE) == Config.LOG_MODE_FILE){
-                    mLogger.addLogger(new FileLogger(fileLogPath,mLogConfig.fileNameFormater,mLogConfig.fileSize));
+                    mLogger.addLogger(new FileLogger(fileLogPath,mLogConfig.fileNameFormater,mLogConfig.fileSize,mLogConfig.syn));
                 }
 
                 if((mLogConfig.logMode & Config.LOG_MODE_NET) == Config.LOG_MODE_NET){
