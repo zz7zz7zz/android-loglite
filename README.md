@@ -1,6 +1,6 @@
 # android-loglite
 
-loglite 是一个轻量级的用于android上的日志打印库，打印的日志类型有：终端日志/文件日志/网络日志，并且可同时支持其中的一种或多种，简单轻量小巧！
+android-loglite是一个轻量级的用于android上的日志打印库，打印的日志类型有：控制台日志/文件日志/网络日志，并且可同时支持其中的一种或多种，简单轻量小巧！
 
 ## 一、配置项说明
 
@@ -40,7 +40,7 @@ Logger.init(this,"log_config",getDiskCacheDir(this));
 ```
 日志打印：
  ```java
-Logger.v("Author", TAG ,"onCreate()");
+Logger.v("Author", TAG ,"your msg!)");
 ```
 
 so easy !!!
