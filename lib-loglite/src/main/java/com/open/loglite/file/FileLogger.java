@@ -23,25 +23,25 @@ public final class FileLogger implements ILog {
     @Override
     public void v(int priority, String tag, String... kv) {
         if(syn){
-            queen.add(new LogMessage(LOG_VERBOSE,tag,kv));
+            mMessageQueen.add(new LogMessage(LOG_VERBOSE,tag,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    if(queen.isEmpty()){
+                    if(mMessageQueen.isEmpty()){
                         return;
                     }
 
                     openFile();
-                    while (!queen.isEmpty()){
-                        LogMessage msg = queen.poll();
-                        print(LOG_VERBOSE,msg.tag,msg.kvs);
+                    while (!mMessageQueen.isEmpty()){
+                        LogMessage msg = mMessageQueen.poll();
+                        write(LOG_VERBOSE,msg.tag,msg.kvs);
                     }
                     closeFile();
                 }
             });
         }else{
             openFile();
-            print(LOG_VERBOSE,tag,kv);
+            write(LOG_VERBOSE,tag,kv);
             closeFile();
         }
     }
@@ -49,25 +49,25 @@ public final class FileLogger implements ILog {
     @Override
     public void d(int priority, String tag, String... kv) {
         if(syn){
-            queen.add(new LogMessage(LOG_DEBUG,tag,kv));
+            mMessageQueen.add(new LogMessage(LOG_DEBUG,tag,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    if(queen.isEmpty()){
+                    if(mMessageQueen.isEmpty()){
                         return;
                     }
 
                     openFile();
-                    while (!queen.isEmpty()){
-                        LogMessage msg = queen.poll();
-                        print(LOG_DEBUG,msg.tag,msg.kvs);
+                    while (!mMessageQueen.isEmpty()){
+                        LogMessage msg = mMessageQueen.poll();
+                        write(LOG_DEBUG,msg.tag,msg.kvs);
                     }
                     closeFile();
                 }
             });
         }else{
             openFile();
-            print(LOG_DEBUG,tag,kv);
+            write(LOG_DEBUG,tag,kv);
             closeFile();
         }
     }
@@ -75,25 +75,25 @@ public final class FileLogger implements ILog {
     @Override
     public void i(int priority, String tag, String... kv) {
         if(syn){
-            queen.add(new LogMessage(LOG_INFO,tag,kv));
+            mMessageQueen.add(new LogMessage(LOG_INFO,tag,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    if(queen.isEmpty()){
+                    if(mMessageQueen.isEmpty()){
                         return;
                     }
 
                     openFile();
-                    while (!queen.isEmpty()){
-                        LogMessage msg = queen.poll();
-                        print(LOG_INFO,msg.tag,msg.kvs);
+                    while (!mMessageQueen.isEmpty()){
+                        LogMessage msg = mMessageQueen.poll();
+                        write(LOG_INFO,msg.tag,msg.kvs);
                     }
                     closeFile();
                 }
             });
         }else{
             openFile();
-            print(LOG_INFO,tag,kv);
+            write(LOG_INFO,tag,kv);
             closeFile();
         }
     }
@@ -101,25 +101,25 @@ public final class FileLogger implements ILog {
     @Override
     public void w(int priority, String tag, String... kv) {
         if(syn){
-            queen.add(new LogMessage(LOG_WARN,tag,kv));
+            mMessageQueen.add(new LogMessage(LOG_WARN,tag,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    if(queen.isEmpty()){
+                    if(mMessageQueen.isEmpty()){
                         return;
                     }
 
                     openFile();
-                    while (!queen.isEmpty()){
-                        LogMessage msg = queen.poll();
-                        print(LOG_WARN,msg.tag,msg.kvs);
+                    while (!mMessageQueen.isEmpty()){
+                        LogMessage msg = mMessageQueen.poll();
+                        write(LOG_WARN,msg.tag,msg.kvs);
                     }
                     closeFile();
                 }
             });
         }else{
             openFile();
-            print(LOG_WARN,tag,kv);
+            write(LOG_WARN,tag,kv);
             closeFile();
         }
     }
@@ -127,48 +127,53 @@ public final class FileLogger implements ILog {
     @Override
     public void e(int priority, String tag, String... kv) {
         if(syn){
-            queen.add(new LogMessage(LOG_ERROR,tag,kv));
+            mMessageQueen.add(new LogMessage(LOG_ERROR,tag,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    if(queen.isEmpty()){
+                    if(mMessageQueen.isEmpty()){
                         return;
                     }
 
                     openFile();
-                    while (!queen.isEmpty()){
-                        LogMessage msg = queen.poll();
-                        print(LOG_ERROR,msg.tag,msg.kvs);
+                    while (!mMessageQueen.isEmpty()){
+                        LogMessage msg = mMessageQueen.poll();
+                        write(LOG_ERROR,msg.tag,msg.kvs);
                     }
                     closeFile();
                 }
             });
         }else{
             openFile();
-            print(LOG_ERROR,tag,kv);
+            write(LOG_ERROR,tag,kv);
             closeFile();
         }
     }
 
     //------------------------------------------------------------
+    private final String    fileSavePath;
+    private final String    fileNameFormater;//命名规则
+    private final long      fileSize;//每一个文件大小
+    private final boolean   syn;//是否是异步写文件
+
     private FileWriter fw = null;
-    public final String logPath;
-    public final String fileNameFormater;//命名规则
-    public final long fileSize;//每一个文件大小
-    public final boolean syn;//是否是异步写文件
-    public int fileNameIndex = 0;
-    public long writtenedSize = 0;
-    private String writtenFileName;
+    private int     fileNameIndex = 0;
+    private long    writtenSize = 0;
+    private String  writtenFileName;
+    private ConcurrentLinkedQueue<LogMessage> mMessageQueen = new ConcurrentLinkedQueue();
+    private ThreadPoolExecutor executor = new ThreadPoolExecutor(0,1,60L, TimeUnit.SECONDS,new LinkedBlockingDeque<Runnable>(1), new ThreadPoolExecutor.DiscardPolicy());
+
+    //------------------------------------------------------------
 
     public FileLogger(String logPath , String fileNameFormater, long fileSize , boolean isSyn) {
-        this.logPath = logPath;
+        this.fileSavePath = logPath;
         this.fileNameFormater = fileNameFormater;
         this.fileSize = fileSize;
         this.syn = isSyn;
         initFile();
     }
 
-    private void print(String priority, String tag, String... kv){
+    private void write(String priority, String tag, String... kv){
         if(kv.length>1){
             StringBuilder sb = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX);
             int count = 0;
@@ -230,7 +235,7 @@ public final class FileLogger implements ILog {
 
     private void write(String priority, String tag, String kv){
 
-        if((writtenedSize + tag.length() +  kv.length())>= fileSize){//当写入的文件长度大于等于一个文件的大小时，应该重新创建一个新的文件进行写入
+        if((writtenSize + tag.length() +  kv.length())>= fileSize){//当写入的文件长度大于等于一个文件的大小时，应该重新创建一个新的文件进行写入
             closeFile();
             initFile();
             openFile();
@@ -248,7 +253,7 @@ public final class FileLogger implements ILog {
                 fw.write(" ");
                 fw.write(kv);
                 fw.write(NEW_LINE);
-                writtenedSize += (time.length() + 1 +priority.length()+ 1+ tag.length() + 1 +  kv.length());
+                writtenSize += (time.length() + 1 +priority.length()+ 1+ tag.length() + 1 +  kv.length());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -258,7 +263,7 @@ public final class FileLogger implements ILog {
 
     private boolean initFile(){
         writtenFileName = null;
-        writtenedSize = 0;
+        writtenSize = 0;
 
         while(true){
 
@@ -266,7 +271,7 @@ public final class FileLogger implements ILog {
 
             String pattern = String.format(fileNameFormater,fileNameIndex);
             SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-            writtenFileName = logPath + sdf.format(new Date())+".txt";
+            writtenFileName = fileSavePath + sdf.format(new Date())+".txt";
             File file = new File(writtenFileName);
 
             if(file.exists()) {
@@ -308,14 +313,5 @@ public final class FileLogger implements ILog {
             e.printStackTrace();
         }
     }
-
-    //------------------------------------------------------------
-    //无锁队列
-    private ConcurrentLinkedQueue<LogMessage> queen = new ConcurrentLinkedQueue();
-
-    //线程池
-    private ThreadPoolExecutor executor = new ThreadPoolExecutor(0,1,60L, TimeUnit.SECONDS,new LinkedBlockingDeque<Runnable>(1), new ThreadPoolExecutor.DiscardPolicy());
-
-
 
 }

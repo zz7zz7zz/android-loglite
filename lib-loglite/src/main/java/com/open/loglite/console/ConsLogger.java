@@ -11,7 +11,6 @@ import com.open.loglite.base.ILog;
 
 public final class ConsLogger implements ILog {
 
-
     @Override
     public void v(int priority, String tag, String... kv) {
         print(priority,tag,kv);
@@ -38,10 +37,6 @@ public final class ConsLogger implements ILog {
     }
 
     //------------------------------------------------------------
-    //The message may have been truncated by the kernel log driver if msg's length is bigger than LOGGER_ENTRY_MAX_LEN.
-    public static final int LOGGER_ENTRY_MAX_LEN    =    (4*1024);
-    public static final int LOGGER_ENTRY_MAX_LEN_FIX= LOGGER_ENTRY_MAX_LEN / 4;
-
     public static final int LOG_SYSTEM = 1;
     public static final int LOG_LOG    = 2;
 
@@ -131,5 +126,4 @@ public final class ConsLogger implements ILog {
         }
     }
 
-    //------------------------------------------------------------
 }

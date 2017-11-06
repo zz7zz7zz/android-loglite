@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 
 import com.open.loglite.base.Config;
@@ -30,27 +29,23 @@ public class MainActivity extends Activity {
         findViewById(R.id.log_text).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Logger.v("A",TAG,"onCreate");
+
+//                StringBuilder sb = new StringBuilder(5000);
+//                for (int i = 1; i < 502; i++) {
+//                    sb.append(String.format("%010d",i));
+//                }
+//                String str= sb.toString();
+//                int len = Log.v(TAG,str);
+////        Log.v(TAG,"---- len " + len);
+////        System.out.println("---- len " + len);
+////        System.out.println(str);
+//
+//                Logger.v("A",TAG,str);
+
             }
         });
-
-
-//        log();
-    }
-
-
-    public void log(){
-        StringBuilder sb = new StringBuilder(5000);
-        for (int i = 1; i < 502; i++) {
-            sb.append(String.format("%010d",i));
-        }
-        String str= sb.toString();
-        int len = Log.v(TAG,str);
-//        Log.v(TAG,"---- len " + len);
-//        System.out.println("---- len " + len);
-//        System.out.println(str);
-
-        Logger.v("A",TAG,str);
     }
 
 
