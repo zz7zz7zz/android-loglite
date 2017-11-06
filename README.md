@@ -43,7 +43,7 @@ Logger.init(this,"log_config",getDiskCacheDir(this));
 Logger.v("Author", TAG ,"onCreate()");
 ```
 
-    so easy !!!
+so easy !!!
     
     
     
