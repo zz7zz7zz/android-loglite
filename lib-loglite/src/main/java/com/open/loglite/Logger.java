@@ -36,7 +36,7 @@ public final class Logger{
                 }
 
                 if((mLogConfig.logMode & Config.LOG_MODE_NET) == Config.LOG_MODE_NET){
-                    mLogger.addLogger(new NetLogger());
+                    mLogger.addLogger(new NetLogger(mLogConfig.tcpArray));
                 }
             }else{
                 destroy();

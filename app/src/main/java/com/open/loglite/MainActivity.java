@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 
 import com.open.loglite.base.Config;
 
@@ -25,14 +26,13 @@ public class MainActivity extends Activity {
             System.out.println(mConfig);
             isInited = true;
         }
-        Log.v(TAG,"onCreate--1--"+Thread.currentThread().getId() + " " + Thread.currentThread().getName());
-        new Thread(new Runnable() {
+
+        findViewById(R.id.log_text).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                Log.v(TAG,"onCreate--2--"+Thread.currentThread().getId() + " " + Thread.currentThread().getName());
+            public void onClick(View v) {
+                Logger.v("A",TAG,"onCreate");
             }
-        }).start();
-        Logger.v("A",TAG,"onCreate");
+        });
 
 
 //        log();

@@ -6,10 +6,12 @@ package com.open.loglite.base;
 
 public class LogMessage {
 
+    public String priority;
     public String tag;
     public String []kvs;
 
-    public LogMessage(String tag, String ... kvs) {
+    public LogMessage(String priority, String tag, String[] kvs) {
+        this.priority = priority;
         this.tag = tag;
         this.kvs = kvs;
     }

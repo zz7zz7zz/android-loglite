@@ -1,7 +1,5 @@
 package com.open.loglite.file;
 
-import android.util.Log;
-
 import com.open.loglite.base.ILog;
 import com.open.loglite.base.LogMessage;
 
@@ -22,16 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 public final class FileLogger implements ILog {
 
-    public static final String LOG_VERBOSE = "V/";
-    public static final String LOG_DEBUG   = "D/";
-    public static final String LOG_INFO    = "I/";
-    public static final String LOG_WARN    = "W/";
-    public static final String LOG_ERROR   = "E/";
-
     @Override
     public void v(int priority, String tag, String... kv) {
         if(syn){
-            queen.add(new LogMessage(tag,kv));
+            queen.add(new LogMessage(LOG_VERBOSE,tag,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -57,7 +49,7 @@ public final class FileLogger implements ILog {
     @Override
     public void d(int priority, String tag, String... kv) {
         if(syn){
-            queen.add(new LogMessage(tag,kv));
+            queen.add(new LogMessage(LOG_DEBUG,tag,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -83,7 +75,7 @@ public final class FileLogger implements ILog {
     @Override
     public void i(int priority, String tag, String... kv) {
         if(syn){
-            queen.add(new LogMessage(tag,kv));
+            queen.add(new LogMessage(LOG_INFO,tag,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -109,7 +101,7 @@ public final class FileLogger implements ILog {
     @Override
     public void w(int priority, String tag, String... kv) {
         if(syn){
-            queen.add(new LogMessage(tag,kv));
+            queen.add(new LogMessage(LOG_WARN,tag,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -135,7 +127,7 @@ public final class FileLogger implements ILog {
     @Override
     public void e(int priority, String tag, String... kv) {
         if(syn){
-            queen.add(new LogMessage(tag,kv));
+            queen.add(new LogMessage(LOG_ERROR,tag,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -159,9 +151,6 @@ public final class FileLogger implements ILog {
     }
 
     //------------------------------------------------------------
-    public static final int LOGGER_ENTRY_MAX_LEN    =    (4*1024);
-    public static final int LOGGER_ENTRY_MAX_LEN_FIX= LOGGER_ENTRY_MAX_LEN / 4;
-    public static final String NEW_LINE = System.getProperty("line.separator");
     private FileWriter fw = null;
     public final String logPath;
     public final String fileNameFormater;//命名规则
