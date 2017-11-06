@@ -28,3 +28,14 @@
     [Net]
     net_tcp=[192.168.123.1:9999,192.168.123.1:9998]         #tcp配置
     net_udp=[192.168.123.1:9999]                            #udp配置
+    
+## 二、代码接入说明
+
+    //初始化
+```java
+LogConfig mConfig = Logger.init(this,"log_config",getDiskCacheDir(this));
+```
+    //日志打印
+ ```java
+Logger.v("Author", TAG ,"onCreate()");
+```
