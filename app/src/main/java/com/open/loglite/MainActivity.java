@@ -32,6 +32,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
 
                 Logger.v("A",TAG,"onCreate " + (++count));
+                Logger.v("C",TAG,"onCreate " + (++count));
 
 //                StringBuilder sb = new StringBuilder(5000);
 //                for (int i = 1; i < 502; i++) {

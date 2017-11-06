@@ -205,7 +205,12 @@ public final class Config {
     }
 
     public boolean isPermitAuthor(String author){
-        return null != logAuthorMap ? logAuthorMap.get(author) : false;
+        if(null == logAuthorMap){
+            return false;
+        }else{
+            Boolean ret = logAuthorMap.get(author);
+            return (null != ret) ? ret : false;
+        }
     }
 
     public boolean isPermitLevel(int level){
