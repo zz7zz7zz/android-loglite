@@ -34,11 +34,11 @@ loglite 是一个轻量级的用于android上的日志打印库，打印的日�
     
 ## 二、代码接入说明
 
-    //初始化
+初始化：
 ```java
 Logger.init(this,"log_config",getDiskCacheDir(this));
 ```
-    //日志打印
+日志打印：
  ```java
 Logger.v("Author", TAG ,"onCreate()");
 ```
