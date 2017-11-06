@@ -131,7 +131,6 @@ public final class LogConfig {
 
     public static LogConfig parse(Context mContext , String assetFileName) {
         HashMap<String,Object> ret = CfgParser.parseToMap(mContext,assetFileName);
-        System.out.println("-----------------------parse----------------------------||"+ret.toString());
         LogConfig mLogConfig = new LogConfig();
         mLogConfig.init(ret);
         return mLogConfig;
