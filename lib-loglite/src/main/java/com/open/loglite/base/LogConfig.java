@@ -2,6 +2,8 @@ package com.open.loglite.base;
 
 import android.content.Context;
 
+import com.open.loglite.util.CfgParser;
+
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -42,7 +44,7 @@ import java.util.HashMap;
  * Created by long on 2017/9/13.
  */
 
-public final class Config {
+public final class LogConfig {
 
     public static final int LOG_MODE_CONSOLE = 0x1;
     public static final int LOG_MODE_FILE    = 0x2;
@@ -127,9 +129,10 @@ public final class Config {
         }
     }
 
-    public static Config parse(Context mContext , String assetFileName) {
+    public static LogConfig parse(Context mContext , String assetFileName) {
         HashMap<String,Object> ret = CfgParser.parseToMap(mContext,assetFileName);
-        Config mLogConfig = new Config();
+        System.out.println("-----------------------parse----------------------------||"+ret.toString());
+        LogConfig mLogConfig = new LogConfig();
         mLogConfig.init(ret);
         return mLogConfig;
     }
@@ -280,7 +283,7 @@ public final class Config {
 
     @Override
     public String toString() {
-        return "Config{" +
+        return "LogConfig{" +
                 "isEnable=" + isEnable +
                 ", console_log_type=" + console_log_type +
                 ", common_mode=" + common_mode +

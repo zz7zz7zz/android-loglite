@@ -3,11 +3,11 @@ package com.open.loglite;
 import android.content.Context;
 import android.os.Process;
 
-import com.open.loglite.base.Config;
+import com.open.loglite.base.LogConfig;
 import com.open.loglite.base.ILog;
-import com.open.loglite.console.ConsLogger;
-import com.open.loglite.file.FileLogger;
-import com.open.loglite.net.NetLogger;
+import com.open.loglite.loggerimpl.console.ConsLogger;
+import com.open.loglite.loggerimpl.file.FileLogger;
+import com.open.loglite.loggerimpl.net.NetLogger;
 
 import java.util.ArrayList;
 
@@ -17,26 +17,26 @@ import java.util.ArrayList;
 
 public final class Logger{
 
-    private ArrayList<ILog> loggerArray = new ArrayList<>();
+    private ArrayList<ILog> mLoggerList = new ArrayList<>();
     private static Logger mLogger;
-    private static Config mLogConfig;
+    private static LogConfig mLogConfig;
 
     //------------------------------------------
-    public static Config init(Context mContext, String assetFileName,String fileLogPath){
-        mLogConfig = Config.parse(mContext,assetFileName);
+    public static LogConfig init(Context mContext, String assetFileName, String fileLogPath){
+        mLogConfig = LogConfig.parse(mContext,assetFileName);
         if(null != mLogConfig){
             if(mLogConfig.isEnable) {
                 mLogger = new Logger();
 
-                if((mLogConfig.common_mode & Config.LOG_MODE_CONSOLE) == Config.LOG_MODE_CONSOLE){
+                if((mLogConfig.common_mode & LogConfig.LOG_MODE_CONSOLE) == LogConfig.LOG_MODE_CONSOLE){
                     mLogger.addLogger(new ConsLogger(mLogConfig.console_log_type));
                 }
 
-                if((mLogConfig.common_mode & Config.LOG_MODE_FILE) == Config.LOG_MODE_FILE){
+                if((mLogConfig.common_mode & LogConfig.LOG_MODE_FILE) == LogConfig.LOG_MODE_FILE){
                     mLogger.addLogger(new FileLogger(fileLogPath,mLogConfig.file_name_formater,mLogConfig.file_size,mLogConfig.file_syn));
                 }
 
-                if((mLogConfig.common_mode & Config.LOG_MODE_NET) == Config.LOG_MODE_NET){
+                if((mLogConfig.common_mode & LogConfig.LOG_MODE_NET) == LogConfig.LOG_MODE_NET){
                     mLogger.addLogger(new NetLogger(mLogConfig.net_tcp));
                 }
             }else{
@@ -56,12 +56,12 @@ public final class Logger{
 
     //------------------------------------------
     private void addLogger(ILog logger){
-        loggerArray.add(logger);
+        mLoggerList.add(logger);
     }
 
     //------------------------------------------
     public static void v(String author , String tag , String... kv) {
-        if(null == mLogger || null == mLogConfig|| !mLogConfig.isPermit(author,Config.LOG_LEVEL_VERBOSE)){
+        if(null == mLogger || null == mLogConfig|| !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_VERBOSE)){
             return;
         }
 
@@ -72,14 +72,14 @@ public final class Logger{
             }
         }
 
-        int size = mLogger.loggerArray.size();
+        int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.loggerArray.get(i).v(Config.LOG_LEVEL_VERBOSE,tag,kv);
+            mLogger.mLoggerList.get(i).v(LogConfig.LOG_LEVEL_VERBOSE,tag,kv);
         }
     }
 
     public static void d(String author , String tag  , String... kv) {
-        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author,Config.LOG_LEVEL_DEBUG)){
+        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_DEBUG)){
             return;
         }
 
@@ -90,14 +90,14 @@ public final class Logger{
             }
         }
 
-        int size = mLogger.loggerArray.size();
+        int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.loggerArray.get(i).d(Config.LOG_LEVEL_DEBUG,tag,kv);
+            mLogger.mLoggerList.get(i).d(LogConfig.LOG_LEVEL_DEBUG,tag,kv);
         }
     }
 
     public static void i(String author  , String tag , String... kv) {
-        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author,Config.LOG_LEVEL_INFO)){
+        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_INFO)){
             return;
         }
 
@@ -108,14 +108,14 @@ public final class Logger{
             }
         }
 
-        int size = mLogger.loggerArray.size();
+        int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.loggerArray.get(i).i(Config.LOG_LEVEL_INFO,tag,kv);
+            mLogger.mLoggerList.get(i).i(LogConfig.LOG_LEVEL_INFO,tag,kv);
         }
     }
 
     public static void w(String author , String tag  , String... kv) {
-        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author,Config.LOG_LEVEL_WARN)){
+        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_WARN)){
             return;
         }
 
@@ -126,14 +126,14 @@ public final class Logger{
             }
         }
 
-        int size = mLogger.loggerArray.size();
+        int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.loggerArray.get(i).w(Config.LOG_LEVEL_WARN,tag,kv);
+            mLogger.mLoggerList.get(i).w(LogConfig.LOG_LEVEL_WARN,tag,kv);
         }
     }
 
     public static  void e(String author  , String tag , String... kv) {
-        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author,Config.LOG_LEVEL_ERROR)){
+        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_ERROR)){
             return;
         }
 
@@ -144,9 +144,9 @@ public final class Logger{
             }
         }
 
-        int size = mLogger.loggerArray.size();
+        int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.loggerArray.get(i).e(Config.LOG_LEVEL_ERROR,tag,kv);
+            mLogger.mLoggerList.get(i).e(LogConfig.LOG_LEVEL_ERROR,tag,kv);
         }
     }
 

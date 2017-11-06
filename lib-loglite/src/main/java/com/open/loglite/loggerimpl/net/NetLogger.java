@@ -1,6 +1,6 @@
-package com.open.loglite.net;
+package com.open.loglite.loggerimpl.net;
 
-import com.open.loglite.base.Config;
+import com.open.loglite.base.LogConfig;
 import com.open.loglite.base.ILog;
 import com.open.loglite.base.LogMessage;
 
@@ -51,14 +51,14 @@ public final class NetLogger implements ILog {
     //------------------------------------------------------------
     private NioClient mNioClient ;
 
-    public NetLogger(Config.Tcp[] tcpArray) {
+    public NetLogger(LogConfig.Tcp[] tcpArray) {
         mNioClient = new NioClient(tcpArray);
     }
 
     //------------------------------------------------------------
     private class NioClient{
 
-        private Config.Tcp[] tcpArray;
+        private LogConfig.Tcp[] tcpArray;
         private int index = -1;
 
         //无锁队列
@@ -77,7 +77,7 @@ public final class NetLogger implements ILog {
             }
         };
 
-        public NioClient(Config.Tcp[] tcpArray) {
+        public NioClient(LogConfig.Tcp[] tcpArray) {
             this.tcpArray = tcpArray;
             mNioConnection = new NioConnection(mMessageQueen,mNioConnectionListener);
         }
@@ -287,7 +287,6 @@ public final class NetLogger implements ILog {
             while (!mMessageQueen.isEmpty()){
                 LogMessage msg = mMessageQueen.poll();
                 NetLogger.this.write(socketChannel,msg.priority,msg.tag,msg.kvs);
-
             }
             key.interestOps(SelectionKey.OP_READ);
         }

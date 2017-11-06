@@ -1,4 +1,4 @@
-package com.open.loglite.base;
+package com.open.loglite.util;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -92,7 +92,7 @@ public final class CfgParser {
                 }
             }
         }
-System.out.println("-----------------------end----------------------------||"+ret.toString());
+
         return ret;
     }
 
@@ -154,6 +154,26 @@ System.out.println("-----------------------end----------------------------||"+re
         }
         if(!TextUtils.isEmpty(val)){
             return Long.valueOf(val);
+        }
+        return 0;
+    }
+
+    public static float getFloat(final HashMap<String,Object> map , final String ... key){
+        String val = null;
+        HashMap<String,Object> vMap  = map;
+        for (int i = 0;i<key.length;i++){
+            Object obj = vMap.get(key[i]);
+            if(i < key.length -1){
+                if(null == obj || !(obj instanceof HashMap)){
+                    break;
+                }
+                vMap = (HashMap)obj;
+            }else if(obj instanceof String){
+                val = (String)obj;
+            }
+        }
+        if(!TextUtils.isEmpty(val)){
+            return Float.valueOf(val);
         }
         return 0;
     }

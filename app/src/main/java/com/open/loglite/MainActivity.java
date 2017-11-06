@@ -7,7 +7,7 @@ import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 
-import com.open.loglite.base.Config;
+import com.open.loglite.base.LogConfig;
 
 import java.io.File;
 
@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         if(!isInited){
-            Config mConfig = Logger.init(this,"log_config",getDiskCacheDir(this));
+            LogConfig mConfig = Logger.init(this,"log_config",getDiskCacheDir(this));
             System.out.println(mConfig);
             isInited = true;
         }

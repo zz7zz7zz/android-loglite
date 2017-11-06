@@ -1,4 +1,4 @@
-package com.open.loglite.console;
+package com.open.loglite.loggerimpl.console;
 
 import android.util.Log;
 
@@ -114,15 +114,15 @@ public final class ConsLogger implements ILog {
         if((console_log_type & LOG_LOGCAT) == LOG_LOGCAT){
             Log.println(priority,tag,msg);
 
-/*            if(priority == Config.LOG_LEVEL_VERBOSE){
+/*            if(priority == LogConfig.LOG_LEVEL_VERBOSE){
                 Log.v(tag,msg);
-            }else if(priority == Config.LOG_LEVEL_DEBUG){
+            }else if(priority == LogConfig.LOG_LEVEL_DEBUG){
                 Log.d(tag,msg);
-            }else if(priority == Config.LOG_LEVEL_INFO){
+            }else if(priority == LogConfig.LOG_LEVEL_INFO){
                 Log.i(tag,msg);
-            }else if(priority == Config.LOG_LEVEL_WARN){
+            }else if(priority == LogConfig.LOG_LEVEL_WARN){
                 Log.w(tag,msg);
-            }else if(priority == Config.LOG_LEVEL_ERROR){
+            }else if(priority == LogConfig.LOG_LEVEL_ERROR){
                 Log.e(tag,msg);
             }
 */
