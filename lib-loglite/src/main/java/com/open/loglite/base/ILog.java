@@ -1,7 +1,7 @@
 package com.open.loglite.base;
 
 /**
- * Created by Administrator on 2017/9/13.
+ * Created by long on 2017/9/13.
  */
 
 public interface ILog {

@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Administrator on 2017/10/24.
+ * Created by long on 2017/10/24.
  */
 
 public final class CfgParser {

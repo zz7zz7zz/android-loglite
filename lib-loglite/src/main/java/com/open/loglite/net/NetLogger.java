@@ -100,7 +100,7 @@ public final class NetLogger implements ILog {
                 mNioConnection.init(tcpArray[index].ip,tcpArray[index].port);
                 mConnetionThread=new Thread(mNioConnection);
                 mConnetionThread.start();
-                new Thread(new NioConnectStateWatcher(this,10)).start();
+                new Thread(new NioConnectStateWatcher(this,8)).start();
             }else{
                 index = -1;
             }

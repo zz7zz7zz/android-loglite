@@ -4,7 +4,7 @@ package com.open.loglite.base;
  * Created by long on 2017/11/5.
  */
 
-public class LogMessage {
+public final class LogMessage {
 
     public String priority;
     public String tag;

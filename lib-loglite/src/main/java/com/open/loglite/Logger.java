@@ -27,16 +27,16 @@ public final class Logger{
             if(mLogConfig.isEnable) {
                 mLogger = new Logger();
 
-                if((mLogConfig.logMode & Config.LOG_MODE_CONSOLE) == Config.LOG_MODE_CONSOLE){
+                if((mLogConfig.common_mode & Config.LOG_MODE_CONSOLE) == Config.LOG_MODE_CONSOLE){
                     mLogger.addLogger(new ConsLogger());
                 }
 
-                if((mLogConfig.logMode & Config.LOG_MODE_FILE) == Config.LOG_MODE_FILE){
-                    mLogger.addLogger(new FileLogger(fileLogPath,mLogConfig.fileNameFormater,mLogConfig.fileSize,mLogConfig.syn));
+                if((mLogConfig.common_mode & Config.LOG_MODE_FILE) == Config.LOG_MODE_FILE){
+                    mLogger.addLogger(new FileLogger(fileLogPath,mLogConfig.file_name_formater,mLogConfig.file_size,mLogConfig.file_syn));
                 }
 
-                if((mLogConfig.logMode & Config.LOG_MODE_NET) == Config.LOG_MODE_NET){
-                    mLogger.addLogger(new NetLogger(mLogConfig.tcpArray));
+                if((mLogConfig.common_mode & Config.LOG_MODE_NET) == Config.LOG_MODE_NET){
+                    mLogger.addLogger(new NetLogger(mLogConfig.net_tcp));
                 }
             }else{
                 destroy();

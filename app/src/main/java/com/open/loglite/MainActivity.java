@@ -15,13 +15,14 @@ public class MainActivity extends Activity {
 
     private String TAG = "MainActivity";
     static boolean isInited = false;
+    static int count = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         if(!isInited){
-            Config mConfig = Logger.init(this,"log.config",getDiskCacheDir(this));
+            Config mConfig = Logger.init(this,"log_config",getDiskCacheDir(this));
             System.out.println(mConfig);
             isInited = true;
         }
@@ -30,7 +31,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                Logger.v("A",TAG,"onCreate");
+                Logger.v("A",TAG,"onCreate " + (++count));
 
 //                StringBuilder sb = new StringBuilder(5000);
 //                for (int i = 1; i < 502; i++) {
