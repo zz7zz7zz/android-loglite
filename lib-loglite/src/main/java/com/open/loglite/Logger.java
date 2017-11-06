@@ -29,7 +29,7 @@ public final class Logger{
                 mLogger = new Logger();
 
                 if((mLogConfig.common_mode & Config.LOG_MODE_CONSOLE) == Config.LOG_MODE_CONSOLE){
-                    mLogger.addLogger(new ConsLogger());
+                    mLogger.addLogger(new ConsLogger(mLogConfig.console_log_type));
                 }
 
                 if((mLogConfig.common_mode & Config.LOG_MODE_FILE) == Config.LOG_MODE_FILE){

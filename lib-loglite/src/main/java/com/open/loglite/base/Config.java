@@ -75,6 +75,9 @@ public final class Config {
     //-----------ENABLE----------
     public boolean isEnable = false; //是否开启了日志
 
+    //-----------Console----------
+    public int      console_log_type = 1;    //打印日志的方式
+
     //-----------Common----------
     public int      common_mode = 1;    //打印日志的方式
     public int      common_level = 0;   //哪些等级可以输出
@@ -131,6 +134,8 @@ public final class Config {
     private void init(HashMap map){
         if(null != map){
             isEnable        = CfgParser.getBoolean(map,"ENABLE","enable");
+
+            console_log_type = CfgParser.getInt(map,"Console","console_log_type");
 
             common_mode = CfgParser.getInt(map,"Common","common_mode");
             String _logLevel        = CfgParser.getString(map,"Common","common_level");
@@ -274,6 +279,7 @@ public final class Config {
     public String toString() {
         return "Config{" +
                 "isEnable=" + isEnable +
+                ", console_log_type=" + console_log_type +
                 ", common_mode=" + common_mode +
                 ", common_level=" + common_level +
                 ", common_author=" + Arrays.toString(common_author) +

@@ -38,11 +38,15 @@ public final class ConsLogger implements ILog {
 
     //------------------------------------------------------------
     public static final int LOG_SYSTEM = 1;
-    public static final int LOG_LOG    = 2;
+    public static final int LOG_LOGCAT = 2;
 
-    public int log_type = LOG_LOG;
+    public int console_log_type = LOG_LOGCAT;
 
-    private void print(int priority,String tag, String... kv){
+    public ConsLogger(int console_log_type) {
+        this.console_log_type = console_log_type;
+    }
+
+    private void print(int priority, String tag, String... kv){
         if(kv.length>1){
             StringBuilder sb = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX);
             int count = 0;
@@ -103,11 +107,11 @@ public final class ConsLogger implements ILog {
     }
 
     private void print(int priority , String tag , String msg){
-        if((log_type & LOG_SYSTEM) == LOG_SYSTEM){
+        if((console_log_type & LOG_SYSTEM) == LOG_SYSTEM){
             System.out.println(msg);
         }
 
-        if((log_type & LOG_LOG) == LOG_LOG){
+        if((console_log_type & LOG_LOGCAT) == LOG_LOGCAT){
             Log.println(priority,tag,msg);
 
 /*            if(priority == Config.LOG_LEVEL_VERBOSE){
