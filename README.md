@@ -33,9 +33,14 @@
 
     //初始化
 ```java
-LogConfig mConfig = Logger.init(this,"log_config",getDiskCacheDir(this));
+Logger.init(this,"log_config",getDiskCacheDir(this));
 ```
     //日志打印
  ```java
 Logger.v("Author", TAG ,"onCreate()");
 ```
+
+    so easy !!!
+    
+    
+    
