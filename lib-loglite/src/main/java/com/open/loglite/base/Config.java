@@ -7,6 +7,35 @@ import java.util.HashMap;
 
 /**
  * 配置规则
+ <br/>
+ <br/>log_config.txt 样式如下：
+ <br/>#------------配置格式说明start--------<>
+ <br/># 1.模块名以[]开始               如:[ENABLE]
+ <br/># 2.#号之后语句的表示注释         如: #这是一条注释
+ <br/># 3.数组以[]括起来,元素以逗号分隔  如: key=[v1,v2]
+ <br/>#------------配置格式说明end----------
+ <br/>
+ <br/>
+ <br/>[ENABLE]
+ <br/>enable = true                                            #配置总开关
+ <br/>
+ <br/>[Common]
+ <br/>common_mode  = 4                                    #0x1代表控制台；0x2代表文件；0x4代表网络
+ <br/>common_level = 2                                    #取值有>2;<2;=2 ;     另外2:v日志; 3:d日志;  4:I日志;  5:w日志;  6:e日志
+ <br/>common_author= [A,B]                                  #代表AB两个人,默认值为全部
+ <br/>common_authorGroup=[A,B,C,D,E]                         #A,B,C,D,E 代表5个人
+ <br/>common_tag_formater =__FILE__ __CLASS__ __FUNCTION__ __LINE__ __TAG__ # %__FILE__文件名  %__CLASS__类名 %__FUNCTION__方法名 %__LINE__文件行数 __TAG__TAG
+ <br/>
+ <br/>[File]
+ <br/>file_name_formater=yyyy-MM-dd_%d                   #文件名格式化2017-1-1_1.txt
+ <br/>file_size = 1024                                 #长度单位是byte ，所以1M的长度是1024*1024
+ <br/>file_syn  = true
+ <br/>
+ <br/>[Net]
+ <br/>net_tcp=[192.168.123.1:9999,192.168.123.1:9998]             #tcp配置
+ <br/>net_udp=[192.168.123.1:9999]                            #udp配置
+ <br/>
+ <br/>
  * Created by long on 2017/9/13.
  */
 
@@ -31,42 +60,17 @@ public final class Config {
     public static final String __FUNCTION__ = "__FUNCTION__";
     public static final String __LINE__     = "__LINE__";
     public static final String __TAG__      = "__TAG__";
+    public static final String __PID__      = "__PID__";
+    public static final String __TID__      = "__TID__";
 
     public static final int FLAG__FILE__    = 0X0001;
     public static final int FLAG__CLASS__   = 0X0002;
     public static final int FLAG__FUNCTION__= 0X0004;
     public static final int FLAG__LINE__    = 0X0008;
     public static final int FLAG__TAG__     = 0X0010;
+    public static final int FLAG__PID__     = 0X0020;
+    public static final int FLAG__TID__     = 0X0040;
 
-    /*
-        log_config.txt 样式如下：
-        #------------配置格式说明start--------
-        # 1.模块名以[]开始               如:[ENABLE]
-        # 2.#号之后语句的表示注释         如: #这是一条注释
-        # 3.数组以[]括起来,元素以逗号分隔  如: key=[v1,v2]
-        #------------配置格式说明end----------
-
-
-        [ENABLE]
-        enable = true                                            #配置总开关
-
-        [Common]
-        common_mode  = 4                                    #0x1代表控制台；0x2代表文件；0x4代表网络
-        common_level = 2                                    #取值有>2;<2;=2 ;     另外2:v日志; 3:d日志;  4:I日志;  5:w日志;  6:e日志
-        common_author= [A,B]                                  #代表AB两个人,默认值为全部
-        common_authorGroup=[A,B,C,D,E]                         #A,B,C,D,E 代表5个人
-        common_tag_formater =__FILE__ __CLASS__ __FUNCTION__ __LINE__ __TAG__ # %__FILE__文件名  %__CLASS__类名 %__FUNCTION__方法名 %__LINE__文件行数 __TAG__TAG
-
-        [File]
-        file_name_formater=yyyy-MM-dd_%d                   #文件名格式化2017-1-1_1.txt
-        file_size = 1024                                 #长度单位是byte ，所以1M的长度是1024*1024
-        file_syn  = true
-
-        [Net]
-        net_tcp=[192.168.123.1:9999,192.168.123.1:9998]             #tcp配置
-        net_udp=[192.168.123.1:9999]                            #udp配置
-
-     */
 
     //-----------ENABLE----------
     public boolean isEnable = false; //是否开启了日志
@@ -159,7 +163,12 @@ public final class Config {
             if(common_tag_formater.contains(__TAG__)){
                 common_tag_format_flag |= FLAG__TAG__;
             }
-
+            if(common_tag_formater.contains(__PID__)){
+                common_tag_format_flag |= FLAG__PID__;
+            }
+            if(common_tag_formater.contains(__TID__)){
+                common_tag_format_flag |= FLAG__TID__;
+            }
             common_author = CfgParser.getStringArray(map,"Common","common_author");
             common_authorGroup = CfgParser.getStringArray(map,"Common","common_authorGroup");
             if(null != common_author && common_author.length>0){
@@ -244,6 +253,14 @@ public final class Config {
 
         if((common_tag_format_flag & FLAG__LINE__) == FLAG__LINE__){
             ret = ret.replace(__LINE__,names[3]);
+        }
+
+        if((common_tag_format_flag & FLAG__PID__) == FLAG__PID__){
+            ret = ret.replace(__PID__,names[4]);
+        }
+
+        if((common_tag_format_flag & FLAG__TID__) == FLAG__TID__){
+            ret = ret.replace(__TID__,names[5]);
         }
 
         if((common_tag_format_flag & FLAG__TAG__) == FLAG__TAG__){

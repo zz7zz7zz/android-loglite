@@ -1,6 +1,7 @@
 package com.open.loglite;
 
 import android.content.Context;
+import android.os.Process;
 
 import com.open.loglite.base.Config;
 import com.open.loglite.base.ILog;
@@ -65,7 +66,7 @@ public final class Logger{
         }
 
         if(mLogConfig.isCanFormatTag()){
-            String [] names = new String[4];
+            String [] names = new String[6];
             if(fillTraceNames(names)){
                 tag = mLogConfig.formatTag(tag,names);
             }
@@ -83,7 +84,7 @@ public final class Logger{
         }
 
         if(mLogConfig.isCanFormatTag()){
-            String [] names = new String[4];
+            String [] names = new String[6];
             if(fillTraceNames(names)){
                 tag = mLogConfig.formatTag(tag,names);
             }
@@ -101,7 +102,7 @@ public final class Logger{
         }
 
         if(mLogConfig.isCanFormatTag()){
-            String [] names = new String[4];
+            String [] names = new String[6];
             if(fillTraceNames(names)){
                 tag = mLogConfig.formatTag(tag,names);
             }
@@ -119,7 +120,7 @@ public final class Logger{
         }
 
         if(mLogConfig.isCanFormatTag()){
-            String [] names = new String[4];
+            String [] names = new String[6];
             if(fillTraceNames(names)){
                 tag = mLogConfig.formatTag(tag,names);
             }
@@ -137,7 +138,7 @@ public final class Logger{
         }
 
         if(mLogConfig.isCanFormatTag()){
-            String [] names = new String[4];
+            String [] names = new String[6];
             if(fillTraceNames(names)){
                 tag = mLogConfig.formatTag(tag,names);
             }
@@ -169,6 +170,8 @@ public final class Logger{
                 names[1] = st.getClassName();
                 names[2] = st.getMethodName()+"()";
                 names[3] = ""+st.getLineNumber();
+                names[4] = ""+Process.myPid();
+                names[5] = ""+Process.myTid();
                 return true;
             }
         }
