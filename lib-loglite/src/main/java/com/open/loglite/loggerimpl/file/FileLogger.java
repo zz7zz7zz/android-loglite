@@ -21,9 +21,9 @@ import java.util.concurrent.TimeUnit;
 public final class FileLogger implements ILog {
 
     @Override
-    public void v(int priority, String tag, String... kv) {
+    public void v(int priority, String tag, String trace, String... kv) {
         if(syn){
-            mMessageQueen.add(new LogMessage(LOG_VERBOSE,tag,kv));
+            mMessageQueen.add(new LogMessage(LOG_VERBOSE,tag,trace,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -34,22 +34,22 @@ public final class FileLogger implements ILog {
                     openFile();
                     while (!mMessageQueen.isEmpty()){
                         LogMessage msg = mMessageQueen.poll();
-                        write(LOG_VERBOSE,msg.tag,msg.kvs);
+                        println(LOG_VERBOSE,msg.tag,msg.trace,msg.kvs);
                     }
                     closeFile();
                 }
             });
         }else{
             openFile();
-            write(LOG_VERBOSE,tag,kv);
+            println(LOG_VERBOSE,tag,trace,kv);
             closeFile();
         }
     }
 
     @Override
-    public void d(int priority, String tag, String... kv) {
+    public void d(int priority, String tag, String trace, String... kv) {
         if(syn){
-            mMessageQueen.add(new LogMessage(LOG_DEBUG,tag,kv));
+            mMessageQueen.add(new LogMessage(LOG_DEBUG,tag,trace,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -60,22 +60,22 @@ public final class FileLogger implements ILog {
                     openFile();
                     while (!mMessageQueen.isEmpty()){
                         LogMessage msg = mMessageQueen.poll();
-                        write(LOG_DEBUG,msg.tag,msg.kvs);
+                        println(LOG_DEBUG,msg.tag,msg.trace,msg.kvs);
                     }
                     closeFile();
                 }
             });
         }else{
             openFile();
-            write(LOG_DEBUG,tag,kv);
+            println(LOG_DEBUG,tag,trace,kv);
             closeFile();
         }
     }
 
     @Override
-    public void i(int priority, String tag, String... kv) {
+    public void i(int priority, String tag, String trace, String... kv) {
         if(syn){
-            mMessageQueen.add(new LogMessage(LOG_INFO,tag,kv));
+            mMessageQueen.add(new LogMessage(LOG_INFO,tag,trace,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -86,22 +86,22 @@ public final class FileLogger implements ILog {
                     openFile();
                     while (!mMessageQueen.isEmpty()){
                         LogMessage msg = mMessageQueen.poll();
-                        write(LOG_INFO,msg.tag,msg.kvs);
+                        println(LOG_INFO,msg.tag,msg.trace,msg.kvs);
                     }
                     closeFile();
                 }
             });
         }else{
             openFile();
-            write(LOG_INFO,tag,kv);
+            println(LOG_INFO,tag,trace,kv);
             closeFile();
         }
     }
 
     @Override
-    public void w(int priority, String tag, String... kv) {
+    public void w(int priority, String tag, String trace, String... kv) {
         if(syn){
-            mMessageQueen.add(new LogMessage(LOG_WARN,tag,kv));
+            mMessageQueen.add(new LogMessage(LOG_WARN,tag,trace,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -112,22 +112,22 @@ public final class FileLogger implements ILog {
                     openFile();
                     while (!mMessageQueen.isEmpty()){
                         LogMessage msg = mMessageQueen.poll();
-                        write(LOG_WARN,msg.tag,msg.kvs);
+                        println(LOG_WARN,msg.tag,msg.trace,msg.kvs);
                     }
                     closeFile();
                 }
             });
         }else{
             openFile();
-            write(LOG_WARN,tag,kv);
+            println(LOG_WARN,tag,trace,kv);
             closeFile();
         }
     }
 
     @Override
-    public void e(int priority, String tag, String... kv) {
+    public void e(int priority, String tag, String trace, String... kv) {
         if(syn){
-            mMessageQueen.add(new LogMessage(LOG_ERROR,tag,kv));
+            mMessageQueen.add(new LogMessage(LOG_ERROR,tag,trace,kv));
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -138,14 +138,14 @@ public final class FileLogger implements ILog {
                     openFile();
                     while (!mMessageQueen.isEmpty()){
                         LogMessage msg = mMessageQueen.poll();
-                        write(LOG_ERROR,msg.tag,msg.kvs);
+                        println(LOG_ERROR,msg.tag,msg.trace,msg.kvs);
                     }
                     closeFile();
                 }
             });
         }else{
             openFile();
-            write(LOG_ERROR,tag,kv);
+            println(LOG_ERROR,tag,trace,kv);
             closeFile();
         }
     }
@@ -173,7 +173,7 @@ public final class FileLogger implements ILog {
         initFile();
     }
 
-    private void write(String priority, String tag, String... kv){
+    private void println(String priority, String tag, String trace, String... kv){
         if(kv.length>1){
             StringBuilder sb = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX);
             int count = 0;
@@ -188,7 +188,7 @@ public final class FileLogger implements ILog {
 
                     //1. 把上次记录先打印
                     if(sb.length()>0){
-                        write(priority,tag,sb.toString());
+                        log(priority,tag,trace,sb.toString());
                         sb.delete(0,sb.length());
                         count = 0;
                     }
@@ -197,7 +197,7 @@ public final class FileLogger implements ILog {
                     if(length>LOGGER_ENTRY_MAX_LEN_FIX){
                         int page = length % LOGGER_ENTRY_MAX_LEN_FIX == 0 ? length/LOGGER_ENTRY_MAX_LEN_FIX : (length/LOGGER_ENTRY_MAX_LEN_FIX + 1);
                         for(int j = 1;j< page;j++){
-                            write(priority,tag,kv[i].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
+                            log(priority,tag,trace,kv[i].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
                         }
 
                         count += length;
@@ -216,24 +216,24 @@ public final class FileLogger implements ILog {
             }
 
             if(sb.length()>0){
-                write(priority,tag,sb.toString());
+                log(priority,tag,trace,sb.toString());
             }
         }else{
             int length = kv[0].length();
             if(length>LOGGER_ENTRY_MAX_LEN_FIX){
                 int page = length % LOGGER_ENTRY_MAX_LEN_FIX == 0 ? length/LOGGER_ENTRY_MAX_LEN_FIX : (length/LOGGER_ENTRY_MAX_LEN_FIX + 1);
                 for(int j = 1;j< page;j++){
-                    write(priority,tag,kv[0].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
+                    log(priority,tag,trace,kv[0].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
                 }
 
-                write(priority,tag,kv[0].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
+                log(priority,tag,trace,kv[0].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
             }else{
-                write(priority,tag,kv[0]);
+                log(priority,tag,trace,kv[0]);
             }
         }
     }
 
-    private void write(String priority, String tag, String kv){
+    private void log(String priority, String tag, String trace, String kv){
 
         if((writtenSize + tag.length() +  kv.length())>= fileSize){//当写入的文件长度大于等于一个文件的大小时，应该重新创建一个新的文件进行写入
             closeFile();
@@ -246,15 +246,34 @@ public final class FileLogger implements ILog {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
                 String time = sdf.format(new Date());
                 fw.write(time);
-                fw.write(" ");
-                fw.write(priority);
-                fw.write(" ");
-                fw.write(tag);
-                fw.write(" ");
-                fw.write(kv);
+
+                if(null != priority && priority.length()>0){
+                    fw.write(" ");
+                    fw.write(priority);
+                }
+
+                if(null != tag && tag.length()>0){
+                    fw.write(" ");
+                    fw.write(tag);
+                }
+
+                if(null != trace && trace.length()>0){
+                    fw.write(" ");
+                    fw.write(trace);
+                }
+
+                if(null != kv && kv.length()>0){
+                    fw.write(" ");
+                    fw.write(kv);
+                }
+
                 fw.write(NEW_LINE);
                 fw.flush();
-                writtenSize += (time.length() + 1 +priority.length()+ 1+ tag.length() + 1 +  kv.length());
+                writtenSize += (time.length()
+                        + (null != priority ? priority.length() + 1 : 0)
+                        + (null != tag ? tag.length()+ 1 : 0 )
+                        + (null != trace ? trace.length()+ 1 : 0)
+                        + (null != kv ? kv.length()+ 1 :0));
             }
         } catch (IOException e) {
             e.printStackTrace();

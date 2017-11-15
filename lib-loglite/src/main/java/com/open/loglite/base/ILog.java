@@ -16,14 +16,14 @@ public interface ILog {
     String LOG_WARN    = "W/";
     String LOG_ERROR   = "E/";
 
-    void v(int priority , String tag , String ... kv);
+    void v(int priority , String tag , String trace , String ... kv);
 
-    void d(int priority , String tag , String ... kv);
+    void d(int priority , String tag , String trace , String ... kv);
 
-    void i(int priority , String tag , String ... kv);
+    void i(int priority , String tag , String trace , String ... kv);
 
-    void w(int priority , String tag , String ... kv);
+    void w(int priority , String tag , String trace , String ... kv);
 
-    void e(int priority , String tag , String ... kv);
+    void e(int priority , String tag , String trace , String ... kv);
 
 }

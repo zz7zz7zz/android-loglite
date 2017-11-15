@@ -255,7 +255,7 @@ public final class LogConfig {
         return common_tag_format_flag > 0;
     }
 
-    public String formatTag(final String tag , String [] names){
+    public String getTraceInfo(String [] names){
         String ret = common_tag_formater;
         if((common_tag_format_flag & FLAG__FILE__) == FLAG__FILE__){
             ret = ret.replace(__FILE__,names[0]);
@@ -280,11 +280,6 @@ public final class LogConfig {
         if((common_tag_format_flag & FLAG__TID__) == FLAG__TID__){
             ret = ret.replace(__TID__,names[5]);
         }
-
-        if((common_tag_format_flag & FLAG__TAG__) == FLAG__TAG__){
-            ret = ret.replace(__TAG__,tag);
-        }
-
         return ret;
     }
 

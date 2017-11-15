@@ -24,28 +24,28 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public final class NetLogger implements ILog {
 
     @Override
-    public void v(int priority, String tag, String... kv) {
-        mNioClient.sendMessage(new LogMessage(LOG_VERBOSE,tag,kv));
+    public void v(int priority, String tag, String trace, String... kv) {
+        mNioClient.sendMessage(new LogMessage(LOG_VERBOSE,tag,trace,kv));
     }
 
     @Override
-    public void d(int priority, String tag, String... kv) {
-        mNioClient.sendMessage(new LogMessage(LOG_DEBUG,tag,kv));
+    public void d(int priority, String tag, String trace, String... kv) {
+        mNioClient.sendMessage(new LogMessage(LOG_DEBUG,tag,trace,kv));
     }
 
     @Override
-    public void i(int priority, String tag, String... kv) {
-        mNioClient.sendMessage(new LogMessage(LOG_INFO,tag,kv));
+    public void i(int priority, String tag, String trace, String... kv) {
+        mNioClient.sendMessage(new LogMessage(LOG_INFO,tag,trace,kv));
     }
 
     @Override
-    public void w(int priority, String tag, String... kv) {
-        mNioClient.sendMessage(new LogMessage(LOG_WARN,tag,kv));
+    public void w(int priority, String tag, String trace, String... kv) {
+        mNioClient.sendMessage(new LogMessage(LOG_WARN,tag,trace,kv));
     }
 
     @Override
-    public void e(int priority, String tag, String... kv) {
-        mNioClient.sendMessage(new LogMessage(LOG_ERROR,tag,kv));
+    public void e(int priority, String tag, String trace, String... kv) {
+        mNioClient.sendMessage(new LogMessage(LOG_ERROR,tag,trace,kv));
     }
 
     //------------------------------------------------------------
@@ -83,8 +83,8 @@ public final class NetLogger implements ILog {
         }
 
         public void sendMessage(LogMessage msg){
-            mMessageQueen.add(msg);
             if(mNioConnection.isConnected()){
+                mMessageQueen.add(msg);
                 mNioConnection.selector.wakeup();
             }else{
                 if(!mNioConnection.isConnected() && !mNioConnection.isConnecting()){
@@ -150,8 +150,8 @@ public final class NetLogger implements ILog {
         private ConcurrentLinkedQueue<LogMessage> mMessageQueen;
         private INioConnectListener mNioConnectionListener;
 
-        private String ip ="192.168.1.101";
-        private int port =60000;
+        private String ip ="192.168.1.1";
+        private int port =9999;
 
         public NioConnection(ConcurrentLinkedQueue<LogMessage> queen, INioConnectListener mNioConnectionListener) {
             this.mMessageQueen = queen;
@@ -289,7 +289,7 @@ public final class NetLogger implements ILog {
             SocketChannel socketChannel = (SocketChannel) key.channel();
             while (!mMessageQueen.isEmpty()){
                 LogMessage msg = mMessageQueen.poll();
-                NetLogger.this.write(socketChannel,msg.priority,msg.tag,msg.kvs);
+                println(socketChannel,msg.priority,msg.tag,msg.trace,msg.kvs);
             }
             key.interestOps(SelectionKey.OP_READ);
         }
@@ -336,7 +336,7 @@ public final class NetLogger implements ILog {
 
     }
 
-    private void write(SocketChannel socketChannel, String priority, String tag, String... kv){
+    private void println(SocketChannel socketChannel, String priority, String tag, String trace, String... kv){
         if(kv.length>1){
             StringBuilder sb = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX);
             int count = 0;
@@ -351,7 +351,7 @@ public final class NetLogger implements ILog {
 
                     //1. 把上次记录先打印
                     if(sb.length()>0){
-                        write(socketChannel,priority,tag,sb.toString());
+                        log(socketChannel,priority,tag,trace,sb.toString());
                         sb.delete(0,sb.length());
                         count = 0;
                     }
@@ -360,7 +360,7 @@ public final class NetLogger implements ILog {
                     if(length>LOGGER_ENTRY_MAX_LEN_FIX){
                         int page = length % LOGGER_ENTRY_MAX_LEN_FIX == 0 ? length/LOGGER_ENTRY_MAX_LEN_FIX : (length/LOGGER_ENTRY_MAX_LEN_FIX + 1);
                         for(int j = 1;j< page;j++){
-                            write(socketChannel,priority,tag,kv[i].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
+                            log(socketChannel,priority,tag,trace,kv[i].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
                         }
 
                         count += length;
@@ -379,38 +379,51 @@ public final class NetLogger implements ILog {
             }
 
             if(sb.length()>0){
-                write(socketChannel,priority,tag,sb.toString());
+                log(socketChannel,priority,tag,trace,sb.toString());
             }
         }else{
             int length = kv[0].length();
             if(length>LOGGER_ENTRY_MAX_LEN_FIX){
                 int page = length % LOGGER_ENTRY_MAX_LEN_FIX == 0 ? length/LOGGER_ENTRY_MAX_LEN_FIX : (length/LOGGER_ENTRY_MAX_LEN_FIX + 1);
                 for(int j = 1;j< page;j++){
-                    write(socketChannel,priority,tag,kv[0].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
+                    log(socketChannel,priority,tag,trace,kv[0].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
                 }
 
-                write(socketChannel,priority,tag,kv[0].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
+                log(socketChannel,priority,tag,trace,kv[0].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
             }else{
-                write(socketChannel,priority,tag,kv[0]);
+                log(socketChannel,priority,tag,trace,kv[0]);
             }
         }
     }
 
-    private void write(SocketChannel socketChannel,String priority, String tag, String kv){
+    private void log(SocketChannel socketChannel,String priority, String tag,String trace, String kv){
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
         String time = sdf.format(new Date());
 
-        StringBuilder sb = new StringBuilder(time.length() + 1 +priority.length()+ 1+ tag.length() + 1 +  kv.length());
+        StringBuilder sb = new StringBuilder(time.length()
+                + (null != priority ? priority.length() + 1 : 0)
+                + (null != tag ? tag.length()+ 1 : 0 )
+                + (null != trace ? trace.length()+ 1 : 0)
+                + (null != kv ? kv.length()+ 1 :0));
         sb.append(time);
-        sb.append(" ");
-        sb.append(priority);
-        sb.append(" ");
-        sb.append(tag);
-        sb.append(" ");
-        sb.append(kv);
+        if(null != priority && priority.length()>0){
+            sb.append(" ");
+            sb.append(priority);
+        }
+        if(null != tag && tag.length()>0){
+            sb.append(" ");
+            sb.append(tag);
+        }
+        if(null != trace && trace.length()>0){
+            sb.append(" ");
+            sb.append(trace);
+        }
+        if(null != kv && kv.length()>0){
+            sb.append(" ");
+            sb.append(kv);
+        }
         sb.append(NEW_LINE);
-
         ByteBuffer buf=ByteBuffer.wrap(sb.toString().getBytes());
         try {
             socketChannel.write(buf);

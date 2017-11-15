@@ -12,28 +12,28 @@ import com.open.loglite.base.ILog;
 public final class ConsLogger implements ILog {
 
     @Override
-    public void v(int priority, String tag, String... kv) {
-        print(priority,tag,kv);
+    public void v(int priority, String tag, String trace, String... kv) {
+        println(priority,tag,trace,kv);
     }
 
     @Override
-    public void d(int priority, String tag, String... kv) {
-        print(priority,tag,kv);
+    public void d(int priority, String tag, String trace, String... kv) {
+        println(priority,tag,trace,kv);
     }
 
     @Override
-    public void i(int priority, String tag, String... kv) {
-        print(priority,tag,kv);
+    public void i(int priority, String tag, String trace, String... kv) {
+        println(priority,tag,trace,kv);
     }
 
     @Override
-    public void w(int priority, String tag, String... kv) {
-        print(priority,tag,kv);
+    public void w(int priority, String tag, String trace, String... kv) {
+        println(priority,tag,trace,kv);
     }
 
     @Override
-    public void e(int priority, String tag, String... kv) {
-        print(priority,tag,kv);
+    public void e(int priority, String tag, String trace, String... kv) {
+        println(priority,tag,trace,kv);
     }
 
     //------------------------------------------------------------
@@ -46,7 +46,7 @@ public final class ConsLogger implements ILog {
         this.console_log_type = console_log_type;
     }
 
-    private void print(int priority, String tag, String... kv){
+    private void println(int priority, String tag, String trace, String... kv){
         if(kv.length>1){
             StringBuilder sb = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX);
             int count = 0;
@@ -61,7 +61,7 @@ public final class ConsLogger implements ILog {
 
                     //1. 把上次记录先打印
                     if(sb.length()>0){
-                        print(priority,tag,sb.toString());
+                        log(priority,tag,trace,sb.toString());
                         sb.delete(0,sb.length());
                         count = 0;
                     }
@@ -70,7 +70,7 @@ public final class ConsLogger implements ILog {
                     if(length>LOGGER_ENTRY_MAX_LEN_FIX){
                         int page = length % LOGGER_ENTRY_MAX_LEN_FIX == 0 ? length/LOGGER_ENTRY_MAX_LEN_FIX : (length/LOGGER_ENTRY_MAX_LEN_FIX + 1);
                         for(int j = 1;j< page;j++){
-                            print(priority,tag,kv[i].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
+                            log(priority,tag,trace,kv[i].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
                         }
 
                         count += length;
@@ -89,30 +89,30 @@ public final class ConsLogger implements ILog {
             }
 
             if(sb.length()>0){
-                print(priority,tag,sb.toString());
+                log(priority,tag,trace,sb.toString());
             }
         }else{
             int length = kv[0].length();
             if(length>LOGGER_ENTRY_MAX_LEN_FIX){
                 int page = length % LOGGER_ENTRY_MAX_LEN_FIX == 0 ? length/LOGGER_ENTRY_MAX_LEN_FIX : (length/LOGGER_ENTRY_MAX_LEN_FIX + 1);
                 for(int j = 1;j< page;j++){
-                    print(priority,tag,kv[0].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
+                    log(priority,tag,trace,kv[0].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
                 }
 
-                print(priority,tag,kv[0].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
+                log(priority,tag,trace,kv[0].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
             }else{
-                print(priority,tag,kv[0]);
+                log(priority,tag,trace,kv[0]);
             }
         }
     }
 
-    private void print(int priority , String tag , String msg){
+    private void log(int priority , String tag , String trace, String msg){
         if((console_log_type & LOG_SYSTEM) == LOG_SYSTEM){
-            System.out.println(tag+ " " + msg);
+            System.out.println(tag+" "+ trace+ " " + msg);
         }
 
         if((console_log_type & LOG_LOGCAT) == LOG_LOGCAT){
-            Log.println(priority,tag,msg);
+            Log.println(priority,tag,trace + " " +msg);
 
 /*            if(priority == LogConfig.LOG_LEVEL_VERBOSE){
                 Log.v(tag,msg);

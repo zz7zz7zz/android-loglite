@@ -65,16 +65,17 @@ public final class Logger{
             return;
         }
 
+        String trace = null;
         if(mLogConfig.isCanFormatTag()){
             String [] names = new String[6];
             if(fillTraceNames(names)){
-                tag = mLogConfig.formatTag(tag,names);
+                trace = mLogConfig.getTraceInfo(names);
             }
         }
 
         int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.mLoggerList.get(i).v(LogConfig.LOG_LEVEL_VERBOSE,tag,kv);
+            mLogger.mLoggerList.get(i).v(LogConfig.LOG_LEVEL_VERBOSE,tag,trace,kv);
         }
     }
 
@@ -83,16 +84,17 @@ public final class Logger{
             return;
         }
 
+        String trace = null;
         if(mLogConfig.isCanFormatTag()){
             String [] names = new String[6];
             if(fillTraceNames(names)){
-                tag = mLogConfig.formatTag(tag,names);
+                trace = mLogConfig.getTraceInfo(names);
             }
         }
 
         int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.mLoggerList.get(i).d(LogConfig.LOG_LEVEL_DEBUG,tag,kv);
+            mLogger.mLoggerList.get(i).d(LogConfig.LOG_LEVEL_DEBUG,tag,trace,kv);
         }
     }
 
@@ -101,16 +103,17 @@ public final class Logger{
             return;
         }
 
+        String trace = null;
         if(mLogConfig.isCanFormatTag()){
             String [] names = new String[6];
             if(fillTraceNames(names)){
-                tag = mLogConfig.formatTag(tag,names);
+                trace = mLogConfig.getTraceInfo(names);
             }
         }
 
         int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.mLoggerList.get(i).i(LogConfig.LOG_LEVEL_INFO,tag,kv);
+            mLogger.mLoggerList.get(i).i(LogConfig.LOG_LEVEL_INFO,tag,trace,kv);
         }
     }
 
@@ -119,16 +122,17 @@ public final class Logger{
             return;
         }
 
+        String trace = null;
         if(mLogConfig.isCanFormatTag()){
             String [] names = new String[6];
             if(fillTraceNames(names)){
-                tag = mLogConfig.formatTag(tag,names);
+                trace = mLogConfig.getTraceInfo(names);
             }
         }
 
         int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.mLoggerList.get(i).w(LogConfig.LOG_LEVEL_WARN,tag,kv);
+            mLogger.mLoggerList.get(i).w(LogConfig.LOG_LEVEL_WARN,tag,trace,kv);
         }
     }
 
@@ -137,16 +141,17 @@ public final class Logger{
             return;
         }
 
+        String trace = null;
         if(mLogConfig.isCanFormatTag()){
             String [] names = new String[6];
             if(fillTraceNames(names)){
-                tag = mLogConfig.formatTag(tag,names);
+                trace = mLogConfig.getTraceInfo(names);
             }
         }
 
         int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.mLoggerList.get(i).e(LogConfig.LOG_LEVEL_ERROR,tag,kv);
+            mLogger.mLoggerList.get(i).e(LogConfig.LOG_LEVEL_ERROR,tag,trace,kv);
         }
     }
 
