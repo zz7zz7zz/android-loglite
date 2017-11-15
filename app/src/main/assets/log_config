@@ -17,6 +17,7 @@ common_level = 2                                        #取值有>2;<2;=2 ;    
 common_author= [A,B]                                    #代表AB两个人才可以打日志，其它人的日志不可见
 common_authorGroup=[A,B,C,D,E]                          #A,B,C,D,E 代表5个人
 common_tag_formater =__PID__ __TID__ __FILE__ __CLASS__ __FUNCTION__ __LINE__ __TAG__ # %__FILE__文件名  %__CLASS__类名 %__FUNCTION__方法名 %__LINE__文件行数 __TAG__TAG
+#在控制台中如果需要实现点击源文件进行跳转，则可以将__FILE__和__LINE__进行连接(__FILE__:__LINE__)即可
 
 [File]
 file_name_formater=yyyy-MM-dd_%d                        #文件名格式化2017-1-1_1.txt

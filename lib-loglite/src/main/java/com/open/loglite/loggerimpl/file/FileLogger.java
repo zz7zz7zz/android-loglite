@@ -253,6 +253,7 @@ public final class FileLogger implements ILog {
                 fw.write(" ");
                 fw.write(kv);
                 fw.write(NEW_LINE);
+                fw.flush();
                 writtenSize += (time.length() + 1 +priority.length()+ 1+ tag.length() + 1 +  kv.length());
             }
         } catch (IOException e) {

@@ -103,6 +103,9 @@ public final class NetLogger implements ILog {
                 new Thread(new NioConnectStateWatcher(this,8)).start();
             }else{
                 index = -1;
+
+                //循环连接了一遍还没有连接上，说明网络连接不成功，此时清空消息队列，防止队列堆积
+                mMessageQueen.clear();
             }
         }
 
