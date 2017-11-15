@@ -108,7 +108,7 @@ public final class ConsLogger implements ILog {
 
     private void print(int priority , String tag , String msg){
         if((console_log_type & LOG_SYSTEM) == LOG_SYSTEM){
-            System.out.println(msg);
+            System.out.println(tag+ " " + msg);
         }
 
         if((console_log_type & LOG_LOGCAT) == LOG_LOGCAT){
