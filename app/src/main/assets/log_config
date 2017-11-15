@@ -15,8 +15,8 @@ common_author= [A,B]                                    #代表AB两个人才可
 common_authorGroup=[A,B,C,D,E]                          #A,B,C,D,E 代表5个人
 common_tag_formater = (__FILE__:__LINE__)
 
-#common_tag_formater说明1: __FILE__文件名  __CLASS__类名 __FUNCTION__方法名 __LINE__文件行数
-#common_tag_formater说明2: 在控制台中如果需要实现点击源文件进行跳转，则可以将__FILE__和__LINE__进行连接(__FILE__:__LINE__)即可
+                                                        #common_tag_formater说明1: __FILE__文件名  __CLASS__类名 __FUNCTION__方法名 __LINE__文件行数
+                                                        #common_tag_formater说明2: 在控制台中如果需要实现点击源文件进行跳转，则可以将__FILE__和__LINE__进行连接(__FILE__:__LINE__)即可
 
 [Console]
 console_log_type = 2                                    #终端输出类型    SYSTEM = 1; LOGCAT = 2;
@@ -24,7 +24,7 @@ console_log_type = 2                                    #终端输出类型    S
 [File]
 file_name_formater=yyyy-MM-dd_%d                        #文件名格式化2017-1-1_1.txt
 file_size = 10240000                                    #长度单位是byte ，所以1M的长度是1024*1024
-file_syn  = true
+file_syn  = true                                        #true 表示异步写，false表示同步写
 
 [Net]
 net_tcp=[192.168.123.1:9999,192.168.123.1:9998]         #tcp配置
