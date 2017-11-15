@@ -17,7 +17,7 @@ import java.util.HashMap;
  <br/># 3.数组以[]括起来,元素以逗号分隔  如: key=[v1,v2]
  <br/>#------------配置格式说明end----------
  <br/>
- <br/>[Global]
+ <br/>[Switch]
  <br/> enable = true                                           #配置总开关
  <br/>
  <br/>[Common]
@@ -142,7 +142,7 @@ public final class LogConfig {
         if(null != map){
 
             //----------Global----------
-            isEnable        = CfgParser.getBoolean(map,"Global","enable");
+            isEnable        = CfgParser.getBoolean(map,"Switch","enable");
 
             //----------Common----------
             common_mode = CfgParser.getInt(map,"Common","common_mode");

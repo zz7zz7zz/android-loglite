@@ -5,7 +5,7 @@
 #------------配置格式说明end----------
 
 
-[Global]
+[Switch]
 enable = true                                           #配置总开关
 
 [Common]

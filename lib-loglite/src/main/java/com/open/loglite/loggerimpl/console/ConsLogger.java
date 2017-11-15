@@ -37,18 +37,20 @@ public final class ConsLogger implements ILog {
     }
 
     //------------------------------------------------------------
-    public static final int LOG_SYSTEM = 1;
-    public static final int LOG_LOGCAT = 2;
+    private static final int LOG_SYSTEM = 1;
+    private static final int LOG_LOGCAT = 2;
 
-    public int console_log_type = LOG_LOGCAT;
+    private int console_log_type = LOG_LOGCAT;
+    private StringBuilder builder = new StringBuilder(128);
 
     public ConsLogger(int console_log_type) {
         this.console_log_type = console_log_type;
     }
 
     private void println(int priority, String tag, String trace, String... kv){
+        builder.setLength(0);
         if(kv.length>1){
-            StringBuilder sb = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX);
+
             int count = 0;
             for (int i = 0; i < kv.length; i++) {
                 if(null == kv[i]){
@@ -60,9 +62,9 @@ public final class ConsLogger implements ILog {
                 if((count + length) > LOGGER_ENTRY_MAX_LEN_FIX){
 
                     //1. 把上次记录先打印
-                    if(sb.length()>0){
-                        log(priority,tag,trace,sb.toString());
-                        sb.delete(0,sb.length());
+                    if(builder.length()>0){
+                        log(priority,tag,trace, builder.toString());
+                        builder.delete(0, builder.length());
                         count = 0;
                     }
 
@@ -74,22 +76,22 @@ public final class ConsLogger implements ILog {
                         }
 
                         count += length;
-                        sb.append(kv[i].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
+                        builder.append(kv[i].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
 
                     }else{
                         count += length;
-                        sb.append(kv[i]);
+                        builder.append(kv[i]);
                     }
 
                 }else{
 
                     count += kv[i].length();
-                    sb.append(kv[i]);
+                    builder.append(kv[i]);
                 }
             }
 
-            if(sb.length()>0){
-                log(priority,tag,trace,sb.toString());
+            if(builder.length()>0){
+                log(priority,tag,trace, builder.toString());
             }
         }else{
             int length = kv[0].length();
