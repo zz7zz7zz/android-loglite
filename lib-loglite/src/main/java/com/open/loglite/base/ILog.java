@@ -16,6 +16,13 @@ public interface ILog {
     String LOG_WARN    = "W/";
     String LOG_ERROR   = "E/";
 
+    int INDEX_FILENAME      = 0;
+    int INDEX_CLASSNAME     = 1;
+    int INDEX_METHODNAME    = 2;
+    int INDEX_LINENUMBER    = 3;
+    int INDEX_PID           = 4;
+    int INDEX_TID           = 5;
+
     void v(int priority , String tag , String trace , String ... kv);
 
     void d(int priority , String tag , String trace , String ... kv);

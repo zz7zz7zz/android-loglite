@@ -171,16 +171,18 @@ public final class Logger{
                     continue;
                 }
 
-                names[0] = st.getFileName();
-                names[1] = st.getClassName();
-                names[2] = st.getMethodName()+"()";
-                names[3] = ""+st.getLineNumber();
-                names[4] = ""+Process.myPid();
-                names[5] = ""+Process.myTid();
+                names[ILog.INDEX_FILENAME]   = st.getFileName();
+                names[ILog.INDEX_CLASSNAME]  = st.getClassName();
+                names[ILog.INDEX_METHODNAME] = st.getMethodName()+"()";
+                names[ILog.INDEX_LINENUMBER] = ""+st.getLineNumber();
+                names[ILog.INDEX_PID]        = ""+Process.myPid();
+                names[ILog.INDEX_TID]        = ""+Process.myTid();
                 return true;
             }
         }
 
         return false;
     }
+
+
 }

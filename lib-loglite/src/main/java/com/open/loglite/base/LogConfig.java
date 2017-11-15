@@ -258,27 +258,27 @@ public final class LogConfig {
     public String getTraceInfo(String [] names){
         String ret = common_tag_formater;
         if((common_tag_format_flag & FLAG__FILE__) == FLAG__FILE__){
-            ret = ret.replace(__FILE__,names[0]);
+            ret = ret.replace(__FILE__,names[ILog.INDEX_FILENAME]);
         }
 
         if((common_tag_format_flag & FLAG__CLASS__) == FLAG__CLASS__){
-            ret = ret.replace(__CLASS__,names[1]);
+            ret = ret.replace(__CLASS__,names[ILog.INDEX_CLASSNAME]);
         }
 
         if((common_tag_format_flag & FLAG__FUNCTION__) == FLAG__FUNCTION__){
-            ret = ret.replace(__FUNCTION__,names[2]);
+            ret = ret.replace(__FUNCTION__,names[ILog.INDEX_METHODNAME]);
         }
 
         if((common_tag_format_flag & FLAG__LINE__) == FLAG__LINE__){
-            ret = ret.replace(__LINE__,names[3]);
+            ret = ret.replace(__LINE__,names[ILog.INDEX_LINENUMBER]);
         }
 
         if((common_tag_format_flag & FLAG__PID__) == FLAG__PID__){
-            ret = ret.replace(__PID__,names[4]);
+            ret = ret.replace(__PID__,names[ILog.INDEX_PID]);
         }
 
         if((common_tag_format_flag & FLAG__TID__) == FLAG__TID__){
-            ret = ret.replace(__TID__,names[5]);
+            ret = ret.replace(__TID__,names[ILog.INDEX_TID]);
         }
         return ret;
     }
