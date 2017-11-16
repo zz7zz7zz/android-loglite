@@ -53,20 +53,23 @@ public final class NetLogger implements ILog {
     private StringBuilder builder = new StringBuilder(128);
 
     public NetLogger(LogConfig.Tcp[] tcpArray) {
-        mNioClient = new NioClient(tcpArray);
+        mNioClient = new NioClient(tcpArray,null);
     }
 
     //------------------------------------------------------------
     private class NioClient{
 
+        private final LogMessage SIGNAL_RECONNECT = new LogMessage(null,null,null,null);
+
         private LogConfig.Tcp[] tcpArray;
         private int index = -1;
+        private IConnectionReceiveListener mConnectionReceiveListener;
 
         //无锁队列
         private ConcurrentLinkedQueue<LogMessage> mMessageQueen = new ConcurrentLinkedQueue();
         private Thread mConnectionThread;
         private NioConnection mConnection;
-        private LogMessage SIGNAL_RECONNECT = new LogMessage(null,null,null,null);
+
         private INioConnectListener mNioConnectionListener = new INioConnectListener() {
             @Override
             public void onConnectionSuccess() {
@@ -79,8 +82,13 @@ public final class NetLogger implements ILog {
             }
         };
 
-        public NioClient(LogConfig.Tcp[] tcpArray) {
+        public NioClient(LogConfig.Tcp[] tcpArray, IConnectionReceiveListener mConnectionReceiveListener) {
             this.tcpArray = tcpArray;
+            this.mConnectionReceiveListener = mConnectionReceiveListener;
+        }
+
+        public void connect() {
+            sendMessage(SIGNAL_RECONNECT);
         }
 
         public void sendMessage(LogMessage msg){
@@ -147,19 +155,16 @@ public final class NetLogger implements ILog {
 
         private final String TAG = "NioConnection";
 
-        private final int STATE_NONE            =   0;//socket打开
-        private final int STATE_OPEN            =   1;//socket打开
         private final int STATE_CLOSE           =   1<<1;//socket关闭
         private final int STATE_CONNECT_START   =   1<<2;//开始连接server
         private final int STATE_CONNECT_SUCCESS =   1<<3;//连接成功
         private final int STATE_CONNECT_FAILED  =   1<<4;//连接失败
-        private final int STATE_CONNECT_WAIT    =   1<<5;//等待连接
 
         private Selector selector;
         private ByteBuffer readBuffer = ByteBuffer.allocate(8192);
         private SocketChannel socketChannel;
 
-        private int state= STATE_NONE;
+        private int state= STATE_CLOSE;
         private ConcurrentLinkedQueue<LogMessage> mMessageQueen;
         private INioConnectListener mNioConnectionListener;
 
@@ -350,6 +355,11 @@ public final class NetLogger implements ILog {
 
         void onConnectionFailed();
 
+    }
+
+    public interface IConnectionReceiveListener
+    {
+        void onConnectionResponse(String txt);
     }
 
     private void println(SocketChannel socketChannel, String priority, String tag, String trace, String... kv){
