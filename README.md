@@ -47,7 +47,13 @@ Logger.init(this,"log_config",getDiskCacheDir(this));
 Logger.v("Author", TAG ,"your msg!)");
 ```
 
-------------------------------- so easy -------------------------------!!!
     
-    
-    
+## 三、效果展示 
+![](https://github.com/zz7zz7zz/android-loglite/blob/master/log_console.png "控制台打印效果")
+
+![](https://github.com/zz7zz7zz/android-loglite/blob/master/log_file.png "文件打印效果") 
+
+![](https://github.com/zz7zz7zz/android-loglite/blob/master/log_net.png "网络打印效果")  
+
+
+------------------------------- So easy !!! -------------------------------
