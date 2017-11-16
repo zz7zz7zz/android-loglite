@@ -147,7 +147,7 @@ public final class NetLogger implements ILog {
 
         private final String TAG = "NioConnection";
 
-        private final int STATE_NONE =   0;//socket打开
+        private final int STATE_NONE            =   0;//socket打开
         private final int STATE_OPEN            =   1;//socket打开
         private final int STATE_CLOSE           =   1<<1;//socket关闭
         private final int STATE_CONNECT_START   =   1<<2;//开始连接server
@@ -174,10 +174,6 @@ public final class NetLogger implements ILog {
         public void init(String ip, int port){
             this.ip = ip;
             this.port = port;
-        }
-
-        public void open(){
-            state = STATE_OPEN;
         }
 
         public boolean isClosed(){
