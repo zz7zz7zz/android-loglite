@@ -1,7 +1,5 @@
 package com.open.loglite.loggerimpl.net;
 
-import android.util.Log;
-
 import com.open.loglite.base.ILog;
 import com.open.loglite.base.LogConfig;
 import com.open.loglite.base.LogMessage;
@@ -90,24 +88,19 @@ public final class NetLogger implements ILog {
             //2.没有连接,需要进行重连
             //3.在连接不成功，并且也不在重连中时，需要进行重连;
             if(SIGNAL_RECONNECT == msg ){
-                Log.v("NioConnection",this+" sendMessage 1");
                 openConnection();
             }else if(null == mNioConnection){
-                Log.v("NioConnection",this+" sendMessage 2");
                 mMessageQueen.add(msg);
                 openConnection();
             }else if(!mNioConnection.isConnected() && !mNioConnection.isConnecting()){
-                Log.v("NioConnection",this+" sendMessage 3");
                 mMessageQueen.add(msg);
                 openConnection();
             }else{
-                Log.v("NioConnection",this+" isConnecting 4");
                 mMessageQueen.add(msg);
                 if(mNioConnection.isConnected()){
                     mNioConnection.selector.wakeup();
                 }else{
                     //说明正在重连中
-                    Log.v("NioConnection",this+" isConnecting ");
                 }
             }
         }
@@ -118,7 +111,6 @@ public final class NetLogger implements ILog {
                 return;
             }
 
-            Log.v("NioConnection",this+" openConnection ");
             index++;
             if(index < tcpArray.length && index >= 0){
                 closeConnection();
@@ -136,7 +128,6 @@ public final class NetLogger implements ILog {
 
         public synchronized void closeConnection(){
             try {
-                Log.v("NioConnection",this+" closeConnection ");
                 if( null!=mConnetionThread && mConnetionThread.isAlive() ) {
                     mConnetionThread.interrupt();
                 }
@@ -195,7 +186,6 @@ public final class NetLogger implements ILog {
 
         public void close(){
             if(state != STATE_CLOSE){
-                Log.v(TAG,this+" close ");
                 state = STATE_CLOSE;
                 if(null!=socketChannel)
                 {
@@ -224,8 +214,6 @@ public final class NetLogger implements ILog {
 
         @Override
         public void run() {
-            long start = System.currentTimeMillis();
-            Log.v(TAG,this+" start ");
             try {
                 state = STATE_CONNECT_START;
                 setConnectionTimeout(10);
@@ -280,8 +268,6 @@ public final class NetLogger implements ILog {
                 close();
                 this.mNioConnectionListener.onConnectionFailed();
             }
-
-            Log.v(TAG,this+" end " + (System.currentTimeMillis() -start));
         }
 
         private boolean finishConnection(SelectionKey key) throws IOException
