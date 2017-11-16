@@ -64,8 +64,8 @@ public final class NetLogger implements ILog {
 
         //无锁队列
         private ConcurrentLinkedQueue<LogMessage> mMessageQueen = new ConcurrentLinkedQueue();
-        private Thread mConnetionThread;
-        private NioConnection mNioConnection;
+        private Thread mConnectionThread;
+        private NioConnection mConnection;
         private LogMessage SIGNAL_RECONNECT = new LogMessage(null,null,null,null);
         private INioConnectListener mNioConnectionListener = new INioConnectListener() {
             @Override
@@ -89,16 +89,16 @@ public final class NetLogger implements ILog {
             //3.在连接不成功，并且也不在重连中时，需要进行重连;
             if(SIGNAL_RECONNECT == msg ){
                 openConnection();
-            }else if(null == mNioConnection){
+            }else if(null == mConnection){
                 mMessageQueen.add(msg);
                 openConnection();
-            }else if(!mNioConnection.isConnected() && !mNioConnection.isConnecting()){
+            }else if(!mConnection.isConnected() && !mConnection.isConnecting()){
                 mMessageQueen.add(msg);
                 openConnection();
             }else{
                 mMessageQueen.add(msg);
-                if(mNioConnection.isConnected()){
-                    mNioConnection.selector.wakeup();
+                if(mConnection.isConnected()){
+                    mConnection.selector.wakeup();
                 }else{
                     //说明正在重连中
                 }
@@ -107,17 +107,17 @@ public final class NetLogger implements ILog {
 
         public synchronized void openConnection(){
             //已经在连接中就不再进行连接
-            if(null != mNioConnection && !mNioConnection.isClosed()){
+            if(null != mConnection && !mConnection.isClosed()){
                 return;
             }
 
             index++;
             if(index < tcpArray.length && index >= 0){
                 closeConnection();
-                mNioConnection = new NioConnection(mMessageQueen,mNioConnectionListener);
-                mNioConnection.init(tcpArray[index].ip,tcpArray[index].port);
-                mConnetionThread=new Thread(mNioConnection);
-                mConnetionThread.start();
+                mConnection = new NioConnection(mMessageQueen,mNioConnectionListener);
+                mConnection.init(tcpArray[index].ip,tcpArray[index].port);
+                mConnectionThread =new Thread(mConnection);
+                mConnectionThread.start();
             }else{
                 index = -1;
 
@@ -128,15 +128,15 @@ public final class NetLogger implements ILog {
 
         public synchronized void closeConnection(){
             try {
-                if( null!=mConnetionThread && mConnetionThread.isAlive() ) {
-                    mConnetionThread.interrupt();
+                if( null!= mConnectionThread && mConnectionThread.isAlive() ) {
+                    mConnectionThread.interrupt();
                 }
-                mConnetionThread=null;
+                mConnectionThread =null;
 
-                if(null != mNioConnection && !mNioConnection.isClosed()) {
-                    mNioConnection.close();
+                if(null != mConnection && !mConnection.isClosed()) {
+                    mConnection.close();
                 }
-                mNioConnection= null;
+                mConnection = null;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -266,7 +266,9 @@ public final class NetLogger implements ILog {
                 e.printStackTrace();
             }finally{
                 close();
-                this.mNioConnectionListener.onConnectionFailed();
+                if(null != mNioConnectionListener){
+                    mNioConnectionListener.onConnectionFailed();
+                }
             }
         }
 
