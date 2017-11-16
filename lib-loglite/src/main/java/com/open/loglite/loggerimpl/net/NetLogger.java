@@ -87,10 +87,6 @@ public final class NetLogger implements ILog {
             this.mConnectionReceiveListener = mConnectionReceiveListener;
         }
 
-        public void connect() {
-            sendMessage(SIGNAL_RECONNECT);
-        }
-
         public void sendMessage(LogMessage msg){
             //1.重连消息，进行重连
             //2.没有连接,需要进行重连
@@ -111,6 +107,15 @@ public final class NetLogger implements ILog {
                     //说明正在重连中
                 }
             }
+        }
+
+        public synchronized void connect() {
+            sendMessage(SIGNAL_RECONNECT);
+        }
+
+        public synchronized void reConnect(){
+            closeConnection();
+            connect();
         }
 
         public synchronized void openConnection(){
