@@ -122,7 +122,7 @@ public final class NetLogger implements ILog {
             index++;
             if(index < tcpArray.length && index >= 0){
                 closeConnection();
-                mConnection = new NioConnection(mMessageQueen,mNioConnectionListener);
+                mConnection = new NioConnection(mMessageQueen,mNioConnectionListener,mConnectionReceiveListener);
                 mConnection.init(tcpArray[index].ip,tcpArray[index].port);
                 mConnectionThread =new Thread(mConnection);
                 mConnectionThread.start();
@@ -160,6 +160,9 @@ public final class NetLogger implements ILog {
         private final int STATE_CONNECT_SUCCESS =   1<<3;//连接成功
         private final int STATE_CONNECT_FAILED  =   1<<4;//连接失败
 
+        private String ip ="192.168.1.1";
+        private int port =9999;
+
         private Selector selector;
         private ByteBuffer readBuffer = ByteBuffer.allocate(8192);
         private SocketChannel socketChannel;
@@ -167,13 +170,12 @@ public final class NetLogger implements ILog {
         private int state= STATE_CLOSE;
         private ConcurrentLinkedQueue<LogMessage> mMessageQueen;
         private INioConnectListener mNioConnectionListener;
+        private IConnectionReceiveListener mConnectionReceiveListener;
 
-        private String ip ="192.168.1.1";
-        private int port =9999;
-
-        public NioConnection(ConcurrentLinkedQueue<LogMessage> queen, INioConnectListener mNioConnectionListener) {
+        public NioConnection(ConcurrentLinkedQueue<LogMessage> queen, INioConnectListener mNioConnectionListener, IConnectionReceiveListener mConnectionReceiveListener) {
             this.mMessageQueen = queen;
             this.mNioConnectionListener = mNioConnectionListener;
+            this.mConnectionReceiveListener = mConnectionReceiveListener;
         }
 
         public void init(String ip, int port){
@@ -299,6 +301,10 @@ public final class NetLogger implements ILog {
                 key.cancel();
                 return false;
             }
+
+            if(null != mConnectionReceiveListener){
+                mConnectionReceiveListener.onConnectionReceive(new String(readBuffer.array(), 0, numRead));
+            }
             return true;
         }
 
@@ -359,7 +365,7 @@ public final class NetLogger implements ILog {
 
     public interface IConnectionReceiveListener
     {
-        void onConnectionResponse(String txt);
+        void onConnectionReceive(String txt);
     }
 
     private void println(SocketChannel socketChannel, String priority, String tag, String trace, String... kv){
