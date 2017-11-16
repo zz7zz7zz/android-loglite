@@ -1,7 +1,9 @@
 package com.open.loglite.loggerimpl.net;
 
-import com.open.loglite.base.LogConfig;
+import android.util.Log;
+
 import com.open.loglite.base.ILog;
+import com.open.loglite.base.LogConfig;
 import com.open.loglite.base.LogMessage;
 
 import java.io.IOException;
@@ -66,6 +68,7 @@ public final class NetLogger implements ILog {
         private ConcurrentLinkedQueue<LogMessage> mMessageQueen = new ConcurrentLinkedQueue();
         private Thread mConnetionThread;
         private NioConnection mNioConnection;
+        private LogMessage SIGNAL_RECONNECT = new LogMessage(null,null,null,null);
         private INioConnectListener mNioConnectionListener = new INioConnectListener() {
             @Override
             public void onConnectionSuccess() {
@@ -74,34 +77,55 @@ public final class NetLogger implements ILog {
 
             @Override
             public void onConnectionFailed() {
-                open();
+                sendMessage(SIGNAL_RECONNECT);//发送一个空的消息进行SocketConnect操作
             }
         };
 
         public NioClient(LogConfig.Tcp[] tcpArray) {
             this.tcpArray = tcpArray;
-            mNioConnection = new NioConnection(mMessageQueen,mNioConnectionListener);
         }
 
         public void sendMessage(LogMessage msg){
-            if(mNioConnection.isConnected()){
+            //1.重连消息，进行重连
+            //2.没有连接,需要进行重连
+            //3.在连接不成功，并且也不在重连中时，需要进行重连;
+            if(SIGNAL_RECONNECT == msg ){
+                Log.v("NioConnection",this+" sendMessage 1");
+                openConnection();
+            }else if(null == mNioConnection){
+                Log.v("NioConnection",this+" sendMessage 2");
                 mMessageQueen.add(msg);
-                mNioConnection.selector.wakeup();
+                openConnection();
+            }else if(!mNioConnection.isConnected() && !mNioConnection.isConnecting()){
+                Log.v("NioConnection",this+" sendMessage 3");
+                mMessageQueen.add(msg);
+                openConnection();
             }else{
-                if(!mNioConnection.isConnected() && !mNioConnection.isConnecting()){
-                    open();
+                Log.v("NioConnection",this+" isConnecting 4");
+                mMessageQueen.add(msg);
+                if(mNioConnection.isConnected()){
+                    mNioConnection.selector.wakeup();
+                }else{
+                    //说明正在重连中
+                    Log.v("NioConnection",this+" isConnecting ");
                 }
             }
         }
 
-        public void open(){
+        public synchronized void openConnection(){
+            //已经在连接中就不再进行连接
+            if(null != mNioConnection && !mNioConnection.isClosed()){
+                return;
+            }
+
+            Log.v("NioConnection",this+" openConnection ");
             index++;
             if(index < tcpArray.length && index >= 0){
-                close();
+                closeConnection();
+                mNioConnection = new NioConnection(mMessageQueen,mNioConnectionListener);
                 mNioConnection.init(tcpArray[index].ip,tcpArray[index].port);
                 mConnetionThread=new Thread(mNioConnection);
                 mConnetionThread.start();
-                new Thread(new NioConnectStateWatcher(this,8)).start();
             }else{
                 index = -1;
 
@@ -110,21 +134,18 @@ public final class NetLogger implements ILog {
             }
         }
 
-        public void close(){
+        public synchronized void closeConnection(){
             try {
-                if(!mNioConnection.isClosed()) {
-                    try {
-                        if( null!=mConnetionThread && mConnetionThread.isAlive() )
-                        {
-                            mConnetionThread.interrupt();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }finally{
-                        mConnetionThread=null;
-                        mNioConnection.close();
-                    }
+                Log.v("NioConnection",this+" closeConnection ");
+                if( null!=mConnetionThread && mConnetionThread.isAlive() ) {
+                    mConnetionThread.interrupt();
                 }
+                mConnetionThread=null;
+
+                if(null != mNioConnection && !mNioConnection.isClosed()) {
+                    mNioConnection.close();
+                }
+                mNioConnection= null;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -133,7 +154,7 @@ public final class NetLogger implements ILog {
 
     private class NioConnection implements Runnable{
 
-        private final String TAG="NioConnection";
+        private final String TAG = "NioConnection";
 
         private final int STATE_NONE =   0;//socket打开
         private final int STATE_OPEN            =   1;//socket打开
@@ -173,7 +194,24 @@ public final class NetLogger implements ILog {
         }
 
         public void close(){
-            state = STATE_CLOSE;
+            if(state != STATE_CLOSE){
+                Log.v(TAG,this+" close ");
+                state = STATE_CLOSE;
+                if(null!=socketChannel)
+                {
+                    try {
+                        SelectionKey key = socketChannel.keyFor(selector);
+                        if(null != key){
+                            key.cancel();
+                        }
+                        selector.close();
+                        socketChannel.socket().close();
+                        socketChannel.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
         }
 
         public boolean isConnected(){
@@ -186,9 +224,11 @@ public final class NetLogger implements ILog {
 
         @Override
         public void run() {
+            long start = System.currentTimeMillis();
+            Log.v(TAG,this+" start ");
             try {
                 state = STATE_CONNECT_START;
-
+                setConnectionTimeout(10);
                 selector= SelectorProvider.provider().openSelector();
                 socketChannel = SocketChannel.open();
                 socketChannel.configureBlocking(false);
@@ -237,23 +277,11 @@ public final class NetLogger implements ILog {
             } catch (Exception e) {
                 e.printStackTrace();
             }finally{
-                if(null!=socketChannel)
-                {
-                    SelectionKey key = socketChannel.keyFor(selector);
-                    if(null != key){
-                        key.cancel();
-                    }
-                    try {
-                        selector.close();
-                        socketChannel.socket().close();
-                        socketChannel.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
                 close();
                 this.mNioConnectionListener.onConnectionFailed();
             }
+
+            Log.v(TAG,this+" end " + (System.currentTimeMillis() -start));
         }
 
         private boolean finishConnection(SelectionKey key) throws IOException
@@ -294,40 +322,43 @@ public final class NetLogger implements ILog {
             }
             key.interestOps(SelectionKey.OP_READ);
         }
-    }
 
-    private class NioConnectStateWatcher implements Runnable{
-
-        public NioClient mNioClient;
-        public long timeout;//单位是秒
-
-        public NioConnectStateWatcher(NioClient mNioClient, long timeout) {
-            this.mNioClient = mNioClient;
-            this.timeout = timeout;
+        private void setConnectionTimeout(long timeout){
+            new Thread(new NioConnectStateWatcher(timeout)).start();
         }
 
-        @Override
-        public void run() {
-            long start = System.nanoTime();
-            while(true){
-                if(mNioClient.mNioConnection.isConnecting()){
-                    if((System.nanoTime() - start)/1000000000 > timeout){
-                        mNioClient.close();
-                        break;
-                    }else{
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+        private class NioConnectStateWatcher implements Runnable{
+
+            public long timeout;//单位是秒
+
+            public NioConnectStateWatcher(long timeout) {
+                this.timeout = timeout;
+            }
+
+            @Override
+            public void run() {
+                long start = System.nanoTime();
+                while(true){
+                    if(isConnecting()){
+                        if((System.nanoTime() - start)/1000000000 > timeout){
+                            close();
                             break;
+                        }else{
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                                break;
+                            }
                         }
+                    }else{
+                        break;
                     }
-                }else{
-                    break;
                 }
             }
         }
     }
+
 
     private interface INioConnectListener{
 
