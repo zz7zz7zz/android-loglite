@@ -2,6 +2,8 @@ package com.open.loglite.base;
 
 import android.content.Context;
 
+import com.open.loglite.net.data.TcpAddress;
+import com.open.loglite.net.data.UdpAddress;
 import com.open.loglite.util.CfgParser;
 
 import java.util.Arrays;
@@ -102,34 +104,8 @@ public final class LogConfig {
     public boolean  file_syn;
 
     //-----------netConfig----------
-    public Tcp[] net_tcp;
-    public Udp[] net_udp;
-
-    public static class Tcp{
-        public String  ip;
-        public int     port;
-
-        @Override
-        public String toString() {
-            return "Tcp{" +
-                    "ip='" + ip + '\'' +
-                    ", port=" + port +
-                    '}';
-        }
-    }
-
-    public static class Udp{
-        public String  ip;
-        public int     port;
-
-        @Override
-        public String toString() {
-            return "Udp{" +
-                    "ip='" + ip + '\'' +
-                    ", port=" + port +
-                    '}';
-        }
-    }
+    public TcpAddress[] net_tcp;
+    public UdpAddress[] net_udp;
 
     public static LogConfig parse(Context mContext , String assetFileName) {
         HashMap<String,Object> ret = CfgParser.parseToMap(mContext,assetFileName);
@@ -202,25 +178,21 @@ public final class LogConfig {
             //----------Net----------
             String val[]     = CfgParser.getStringArray(map,"Net","net_tcp");
             if(null != val){
-                net_tcp = new Tcp[val.length];
+                net_tcp = new TcpAddress[val.length];
                 for (int i = 0; i < val.length; i++) {
                     String[] v = val[i].split(":");
                     if(v.length>1){
-                        net_tcp[i]  = new Tcp();
-                        net_tcp[i].ip = v[0];
-                        net_tcp[i].port = Integer.valueOf(v[1]);
+                        net_tcp[i]  = new TcpAddress(v[0],Integer.valueOf(v[1]));
                     }
                 }
             }
             val              = CfgParser.getStringArray(map,"Net","net_udp");
             if(null != val){
-                net_udp = new Udp[val.length];
+                net_udp = new UdpAddress[val.length];
                 for (int i = 0; i < val.length; i++) {
                     String[] v = val[i].split(":");
                     if(v.length>1){
-                        net_udp[i] = new Udp();
-                        net_udp[i].ip = v[0];
-                        net_udp[i].port = Integer.valueOf(v[1]);
+                        net_udp[i] = new UdpAddress(v[0],Integer.valueOf(v[1]));
                     }
                 }
             }

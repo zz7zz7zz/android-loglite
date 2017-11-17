@@ -34,13 +34,13 @@ public class MainActivity extends Activity {
                 Logger.v("A",TAG,"onCreate " + (++count));
                 Logger.v("C",TAG,"onCreate " + (++count));
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Logger.v("B",TAG,"Thread run " + (++count));
-                        Logger.v("D",TAG,"Thread run " + (++count));
-                    }
-                }).start();
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Logger.v("B",TAG,"Thread run " + (++count));
+//                        Logger.v("D",TAG,"Thread run " + (++count));
+//                    }
+//                }).start();
 
 //                StringBuilder sb = new StringBuilder(5000);
 //                for (int i = 1; i < 502; i++) {
