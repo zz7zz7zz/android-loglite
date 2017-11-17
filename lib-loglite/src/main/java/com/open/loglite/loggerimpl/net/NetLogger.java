@@ -59,7 +59,7 @@ public final class NetLogger implements ILog {
     //------------------------------------------------------------
     private class NioClient{
 
-        private final LogMessage SIGNAL_RECONNECT = new LogMessage(null,null,null,null);
+        private final String TAG="NioClient";
 
         private LogConfig.Tcp[] tcpArray;
         private int index = -1;
@@ -78,7 +78,7 @@ public final class NetLogger implements ILog {
 
             @Override
             public void onConnectionFailed() {
-                sendMessage(SIGNAL_RECONNECT);//发送一个空的消息进行SocketConnect操作
+                connect();//try to connect next ip port
             }
         };
 
@@ -88,17 +88,14 @@ public final class NetLogger implements ILog {
         }
 
         public void sendMessage(LogMessage msg){
-            //1.重连消息，进行重连
-            //2.没有连接,需要进行重连
-            //3.在连接不成功，并且也不在重连中时，需要进行重连;
-            if(SIGNAL_RECONNECT == msg ){
-                openConnection();
-            }else if(null == mConnection){
+            //1.没有连接,需要进行重连
+            //2.在连接不成功，并且也不在重连中时，需要进行重连;
+            if(null == mConnection){
                 mMessageQueen.add(msg);
-                openConnection();
+                startConnect();
             }else if(!mConnection.isConnected() && !mConnection.isConnecting()){
                 mMessageQueen.add(msg);
-                openConnection();
+                startConnect();
             }else{
                 mMessageQueen.add(msg);
                 if(mConnection.isConnected()){
@@ -110,15 +107,23 @@ public final class NetLogger implements ILog {
         }
 
         public synchronized void connect() {
-            sendMessage(SIGNAL_RECONNECT);
+            startConnect();
         }
 
-        public synchronized void reConnect(){
-            closeConnection();
-            connect();
+        public synchronized void reconnect(){
+            stopConnect(true);
+            //reset the ip/port index of tcpArray
+            if(index+1 >= tcpArray.length || index+1 < 0){
+                index = -1;
+            }
+            startConnect();
         }
 
-        public synchronized void openConnection(){
+        public synchronized void disconnect(){
+            stopConnect(true);
+        }
+
+        private synchronized void startConnect(){
             //已经在连接中就不再进行连接
             if(null != mConnection && !mConnection.isClosed()){
                 return;
@@ -126,9 +131,8 @@ public final class NetLogger implements ILog {
 
             index++;
             if(index < tcpArray.length && index >= 0){
-                closeConnection();
-                mConnection = new NioConnection(mMessageQueen,mNioConnectionListener,mConnectionReceiveListener);
-                mConnection.init(tcpArray[index].ip,tcpArray[index].port);
+                stopConnect(false);
+                mConnection = new NioConnection(tcpArray[index].ip,tcpArray[index].port,mMessageQueen,mNioConnectionListener,mConnectionReceiveListener);
                 mConnectionThread =new Thread(mConnection);
                 mConnectionThread.start();
             }else{
@@ -139,17 +143,20 @@ public final class NetLogger implements ILog {
             }
         }
 
-        public synchronized void closeConnection(){
+        private synchronized void stopConnect(boolean isCloseByUser){
             try {
+
+                if(null != mConnection) {
+                    mConnection.setCloseByUser(isCloseByUser);
+                    mConnection.close();
+                }
+                mConnection = null;
+
                 if( null!= mConnectionThread && mConnectionThread.isAlive() ) {
                     mConnectionThread.interrupt();
                 }
                 mConnectionThread =null;
 
-                if(null != mConnection && !mConnection.isClosed()) {
-                    mConnection.close();
-                }
-                mConnection = null;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -176,25 +183,34 @@ public final class NetLogger implements ILog {
         private ConcurrentLinkedQueue<LogMessage> mMessageQueen;
         private INioConnectListener mNioConnectionListener;
         private IConnectionReceiveListener mConnectionReceiveListener;
+        private boolean isClosedByUser = false;
 
-        public NioConnection(ConcurrentLinkedQueue<LogMessage> queen, INioConnectListener mNioConnectionListener, IConnectionReceiveListener mConnectionReceiveListener) {
+        public NioConnection(String ip, int port, ConcurrentLinkedQueue<LogMessage> queen, INioConnectListener mNioConnectionListener, IConnectionReceiveListener mConnectionReceiveListener) {
+            this.ip = ip;
+            this.port = port;
             this.mMessageQueen = queen;
             this.mNioConnectionListener = mNioConnectionListener;
             this.mConnectionReceiveListener = mConnectionReceiveListener;
-        }
-
-        public void init(String ip, int port){
-            this.ip = ip;
-            this.port = port;
         }
 
         public boolean isClosed(){
             return state == STATE_CLOSE;
         }
 
+        public boolean isConnected(){
+            return state == STATE_CONNECT_SUCCESS;
+        }
+
+        public boolean isConnecting(){
+            return state == STATE_CONNECT_START;
+        }
+
+        public void setCloseByUser(boolean isClosedbyUser){
+            this.isClosedByUser = isClosedbyUser;
+        }
+
         public void close(){
             if(state != STATE_CLOSE){
-                state = STATE_CLOSE;
                 if(null!=socketChannel)
                 {
                     try {
@@ -209,15 +225,8 @@ public final class NetLogger implements ILog {
                         e1.printStackTrace();
                     }
                 }
+                state = STATE_CLOSE;
             }
-        }
-
-        public boolean isConnected(){
-            return state == STATE_CONNECT_SUCCESS;
-        }
-
-        public boolean isConnecting(){
-            return state == STATE_CONNECT_START;
         }
 
         @Override
@@ -274,8 +283,10 @@ public final class NetLogger implements ILog {
                 e.printStackTrace();
             }finally{
                 close();
-                if(null != mNioConnectionListener){
-                    mNioConnectionListener.onConnectionFailed();
+                if(!isClosedByUser){
+                    if(null != mNioConnectionListener){
+                        mNioConnectionListener.onConnectionFailed();
+                    }
                 }
             }
         }
