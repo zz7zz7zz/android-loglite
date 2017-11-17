@@ -286,8 +286,12 @@ public class NioClient{
                 return false;
             }
 
-            if(null != mConnectReceiveListener){
-                mConnectReceiveListener.onConnectionReceive(new String(readBuffer.array(), 0, numRead));
+            if(numRead > 0){
+                if(null != mConnectReceiveListener){
+                    byte[] readArray = new byte[numRead];
+                    System.arraycopy(readBuffer.array(),0,readArray,0,numRead);
+                    mConnectReceiveListener.onConnectionReceive(readArray);
+                }
             }
             return true;
         }

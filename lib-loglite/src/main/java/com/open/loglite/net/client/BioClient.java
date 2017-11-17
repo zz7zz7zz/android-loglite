@@ -330,27 +330,20 @@ public class BioClient {
 				try {
 					while(state!=STATE_CLOSE&&state==STATE_CONNECT_SUCCESS&&null!=inStream)
 					{
-						byte[] bodyBytes=new byte[5];
-						int offset=0;
-						int length=5;
-						int read=0;
+						int maximum_length = 8192;
+						byte[] bodyBytes=new byte[maximum_length];
+						int numRead;
 
-						while((read=inStream.read(bodyBytes, offset, length))>0)
+						while((numRead=inStream.read(bodyBytes, 0, maximum_length))>0)
 						{
-							if(length-read==0)
-							{
+							if(numRead > 0){
 								if(null!= mConnectReceiveListener)
 								{
-									mConnectReceiveListener.onConnectionReceive(new String(bodyBytes));
+									byte[] readArray = new byte[numRead];
+									System.arraycopy(bodyBytes,0,readArray,0,numRead);
+									mConnectReceiveListener.onConnectionReceive(readArray);
 								}
-
-								offset=0;
-								length=5;
-								read=0;
-								continue;
 							}
-							offset+=read;
-							length=5-offset;
 						}
 
 						throw new Exception("read Exception !");
