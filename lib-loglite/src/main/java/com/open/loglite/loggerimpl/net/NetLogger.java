@@ -87,6 +87,10 @@ public final class NetLogger implements ILog {
             this.mConnectionReceiveListener = mConnectionReceiveListener;
         }
 
+        public void setConnectAddress(LogConfig.Tcp[] tcpArray ){
+            this.tcpArray = tcpArray;
+        }
+
         public void sendMessage(LogMessage msg){
             //1.没有连接,需要进行重连
             //2.在连接不成功，并且也不在重连中时，需要进行重连;
