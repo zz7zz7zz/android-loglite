@@ -2,7 +2,6 @@ package com.open.net.client.impl.nio.processor;
 
 import com.open.net.client.impl.nio.NioClient;
 import com.open.net.client.structures.BaseClient;
-import com.open.net.client.structures.BaseMessageProcessor;
 import com.open.net.client.structures.IConnectResultListener;
 
 import java.io.IOException;
@@ -35,17 +34,15 @@ public final class SocketCrwProcessor implements Runnable {
     private Selector mSelector;
     private int state= STATE_CLOSE;
 
-    private BaseMessageProcessor mMessageProcessor;
     private IConnectResultListener mConnectStatusListener;
     private boolean isClosedByUser = false;
 
     private BaseClient mClient;
 
-    public SocketCrwProcessor(BaseClient mClient, String ip, int port, BaseMessageProcessor mMessageProcessor, IConnectResultListener mNioConnectionListener) {
+    public SocketCrwProcessor(BaseClient mClient, String ip, int port, IConnectResultListener mNioConnectionListener) {
         this.mClient = mClient;
         this.ip = ip;
         this.port = port;
-        this.mMessageProcessor = mMessageProcessor;
         this.mConnectStatusListener = mNioConnectionListener;
     }
 
@@ -61,6 +58,10 @@ public final class SocketCrwProcessor implements Runnable {
         return state == STATE_CONNECT_START;
     }
 
+    public void setConnectStart(){
+        state = STATE_CONNECT_START;
+    }
+
     public void setCloseByUser(boolean isClosedByUser){
         this.isClosedByUser = isClosedByUser;
     }
@@ -73,10 +74,18 @@ public final class SocketCrwProcessor implements Runnable {
         }
     }
 
-    //-------------------------------------------------------------------------------------------
     public void wakeUp(){
         if(null != mSelector){
             mSelector.wakeup();
+        }
+    }
+
+    public void onSocketExit(int exit_code){
+        close();
+        if(!isClosedByUser){
+            if(null != mConnectStatusListener){
+                mConnectStatusListener.onConnectionFailed();
+            }
         }
     }
 
@@ -87,7 +96,7 @@ public final class SocketCrwProcessor implements Runnable {
             SocketChannel socketChannel = (SocketChannel) key.channel();
             result= socketChannel.finishConnect();//没有网络的时候也返回true;连不上的情况下会抛出java.net.ConnectException: Connection refused
             if(result) {
-                ((NioClient)mClient).init(mSocketChannel,mSelector,mMessageProcessor);
+                ((NioClient)mClient).init(mSocketChannel,mSelector);
                 key.interestOps(SelectionKey.OP_READ);
                 state=STATE_CONNECT_SUCCESS;
                 if(null != mConnectStatusListener){
@@ -152,6 +161,7 @@ public final class SocketCrwProcessor implements Runnable {
     public void run() {
         try {
             state = STATE_CONNECT_START;
+
             mSelector = SelectorProvider.provider().openSelector();
             mSocketChannel = SocketChannel.open();
             mSocketChannel.configureBlocking(false);
@@ -162,6 +172,7 @@ public final class SocketCrwProcessor implements Runnable {
 
             //处理连接
             boolean isConnectSuccess = connect(10000);
+            state = isConnectSuccess ? STATE_CONNECT_SUCCESS : STATE_CONNECT_FAILED;
 
             //开始读写
             if(isConnectSuccess){
@@ -218,14 +229,8 @@ public final class SocketCrwProcessor implements Runnable {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }finally{
-
-            close();
-            if(!isClosedByUser){
-                if(null != mConnectStatusListener){
-                    mConnectStatusListener.onConnectionFailed();
-                }
-            }
         }
+
+        onSocketExit(1);
     }
 }

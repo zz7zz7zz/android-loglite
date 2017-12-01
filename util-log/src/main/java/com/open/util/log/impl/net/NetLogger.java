@@ -69,8 +69,8 @@ public final class NetLogger implements ILog {
     };
 
     public NetLogger(TcpAddress[] tcpArray) {
-        mNioClient = new NioClient();
-        mNioClient.setConnector(new NioConnector(mNioClient,tcpArray, mMessageProcessor, mConnectResultListener));
+        mNioClient = new NioClient(mMessageProcessor);
+        mNioClient.setConnector(new NioConnector(mNioClient,tcpArray, mConnectResultListener));
     }
 
     //------------------------------------------------------------
