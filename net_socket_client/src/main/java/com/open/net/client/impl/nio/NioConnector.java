@@ -1,8 +1,8 @@
 package com.open.net.client.impl.nio;
 
 import com.open.net.client.impl.nio.processor.SocketCrwProcessor;
-import com.open.net.client.structures.IConnectResultListener;
 import com.open.net.client.structures.BaseMessageProcessor;
+import com.open.net.client.structures.IConnectResultListener;
 import com.open.net.client.structures.TcpAddress;
 
 /**
