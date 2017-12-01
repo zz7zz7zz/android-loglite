@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
 
                 Logger.v("A",TAG,"onCreate " + (++count));
-                Logger.v("C",TAG,"onCreate " + (++count));
+//                Logger.v("C",TAG,"onCreate " + (++count));
 
 //                new Thread(new Runnable() {
 //                    @Override

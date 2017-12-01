@@ -63,6 +63,8 @@ public final class NioClient extends BaseClient{
                 e1.printStackTrace();
             }
         }
+        mSocketChannel = null;
+        mSelector = null;
     }
 
     public boolean onRead() {
