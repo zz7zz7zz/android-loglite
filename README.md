@@ -56,4 +56,8 @@ Logger.v("Author", TAG ,"your msg!)");
 ![](https://github.com/zz7zz7zz/android-loglite/blob/master/log_net.png "网络打印效果")  
 
 
-------------------------------- So easy !!! -------------------------------
+
+------------------------------- so easy -------------------------------
+
+
+
