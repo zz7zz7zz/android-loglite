@@ -1,4 +1,4 @@
-package com.open.loglite.loggerimpl.console;
+package com.open.loglite.impl.console;
 
 import android.util.Log;
 

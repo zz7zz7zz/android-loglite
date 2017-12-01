@@ -1,4 +1,4 @@
-package com.open.loglite.loggerimpl.file;
+package com.open.loglite.impl.file;
 
 import com.open.loglite.base.ILog;
 import com.open.loglite.base.LogMessage;

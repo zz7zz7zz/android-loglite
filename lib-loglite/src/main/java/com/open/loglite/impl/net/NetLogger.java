@@ -1,4 +1,4 @@
-package com.open.loglite.loggerimpl.net;
+package com.open.loglite.impl.net;
 
 import com.open.loglite.base.ILog;
 import com.open.loglite.net.client.NioClient;

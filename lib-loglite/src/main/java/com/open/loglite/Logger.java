@@ -5,9 +5,9 @@ import android.os.Process;
 
 import com.open.loglite.base.LogConfig;
 import com.open.loglite.base.ILog;
-import com.open.loglite.loggerimpl.console.ConsLogger;
-import com.open.loglite.loggerimpl.file.FileLogger;
-import com.open.loglite.loggerimpl.net.NetLogger;
+import com.open.loglite.impl.console.ConsLogger;
+import com.open.loglite.impl.file.FileLogger;
+import com.open.loglite.impl.net.NetLogger;
 
 import java.util.ArrayList;
 
