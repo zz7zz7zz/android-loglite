@@ -2,8 +2,8 @@ package com.open.util.log.base;
 
 import android.content.Context;
 
-import com.open.util.log.net.data.TcpAddress;
-import com.open.util.log.net.data.UdpAddress;
+import com.open.net.client.structures.TcpAddress;
+import com.open.net.client.structures.UdpAddress;
 import com.open.util.log.util.CfgParser;
 
 import java.util.Arrays;

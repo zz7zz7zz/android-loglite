@@ -1,16 +1,17 @@
 package com.open.util.log.impl.net;
 
+import com.open.net.client.impl.nio.NioClient;
+import com.open.net.client.impl.nio.NioConnector;
+import com.open.net.client.structures.BaseClient;
+import com.open.net.client.structures.BaseMessageProcessor;
+import com.open.net.client.structures.IConnectResultListener;
+import com.open.net.client.structures.TcpAddress;
+import com.open.net.client.structures.message.Message;
 import com.open.util.log.base.ILog;
-import com.open.util.log.net.client.NioClient;
-import com.open.util.log.net.data.AbsMessage;
-import com.open.util.log.net.data.TcpAddress;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 
 /**
  * 网络日志
@@ -21,39 +22,59 @@ public final class NetLogger implements ILog {
 
     @Override
     public void v(int priority, String tag, String trace, String... kv) {
-        mNioClient.sendMessage(new NetLogMessage(LOG_VERBOSE,tag,trace,kv));
+        println(LOG_VERBOSE,tag,trace,kv);
     }
 
     @Override
     public void d(int priority, String tag, String trace, String... kv) {
-        mNioClient.sendMessage(new NetLogMessage(LOG_DEBUG,tag,trace,kv));
+        println(LOG_DEBUG,tag,trace,kv);
     }
 
     @Override
     public void i(int priority, String tag, String trace, String... kv) {
-        mNioClient.sendMessage(new NetLogMessage(LOG_INFO,tag,trace,kv));
+        println(LOG_INFO,tag,trace,kv);
     }
 
     @Override
     public void w(int priority, String tag, String trace, String... kv) {
-        mNioClient.sendMessage(new NetLogMessage(LOG_WARN,tag,trace,kv));
+        println(LOG_WARN,tag,trace,kv);
     }
 
     @Override
     public void e(int priority, String tag, String trace, String... kv) {
-        mNioClient.sendMessage(new NetLogMessage(LOG_ERROR,tag,trace,kv));
+        println(LOG_ERROR,tag,trace,kv);
     }
 
     //------------------------------------------------------------
-    private NioClient mNioClient ;
     private StringBuilder builder = new StringBuilder(128);
+    private NioClient mNioClient ;
+    private IConnectResultListener mConnectResultListener = new IConnectResultListener() {
+        @Override
+        public void onConnectionSuccess() {
+
+        }
+
+        @Override
+        public void onConnectionFailed() {
+            mNioClient.getConnector().connect();//try to connect next ip port
+        }
+    };
+
+    private BaseMessageProcessor mMessageProcessor =new BaseMessageProcessor() {
+
+        @Override
+        public void onReceiveMessages(BaseClient mClient, final LinkedList<Message> mQueen) {
+            //对收到的信息不处理
+        }
+    };
 
     public NetLogger(TcpAddress[] tcpArray) {
-        mNioClient = new NioClient(tcpArray,null);
+        mNioClient = new NioClient();
+        mNioClient.setConnector(new NioConnector(mNioClient,tcpArray, mMessageProcessor, mConnectResultListener));
     }
 
     //------------------------------------------------------------
-    private boolean println(SocketChannel socketChannel, String priority, String tag, String trace, String... kv){
+    private boolean println(String priority, String tag, String trace, String... kv){
         boolean ret = false;
         builder.setLength(0);
         if(kv.length>1){
@@ -69,7 +90,7 @@ public final class NetLogger implements ILog {
 
                     //1. 把上次记录先打印
                     if(builder.length()>0){
-                        ret = log(socketChannel,priority,tag,trace, builder.toString());
+                        ret = log(priority,tag,trace, builder.toString());
                         if(!ret){
                             return ret;
                         }
@@ -81,7 +102,7 @@ public final class NetLogger implements ILog {
                     if(length>LOGGER_ENTRY_MAX_LEN_FIX){
                         int page = length % LOGGER_ENTRY_MAX_LEN_FIX == 0 ? length/LOGGER_ENTRY_MAX_LEN_FIX : (length/LOGGER_ENTRY_MAX_LEN_FIX + 1);
                         for(int j = 1;j< page;j++){
-                            ret = log(socketChannel,priority,tag,trace,kv[i].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
+                            ret = log(priority,tag,trace,kv[i].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
                             if(!ret){
                                 return ret;
                             }
@@ -103,7 +124,7 @@ public final class NetLogger implements ILog {
             }
 
             if(builder.length()>0){
-                ret = log(socketChannel,priority,tag,trace, builder.toString());
+                ret = log(priority,tag,trace, builder.toString());
                 if(!ret){
                     return ret;
                 }
@@ -113,18 +134,18 @@ public final class NetLogger implements ILog {
             if(length>LOGGER_ENTRY_MAX_LEN_FIX){
                 int page = length % LOGGER_ENTRY_MAX_LEN_FIX == 0 ? length/LOGGER_ENTRY_MAX_LEN_FIX : (length/LOGGER_ENTRY_MAX_LEN_FIX + 1);
                 for(int j = 1;j< page;j++){
-                    ret = log(socketChannel,priority,tag,trace,kv[0].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
+                    ret = log(priority,tag,trace,kv[0].substring((j-1)*LOGGER_ENTRY_MAX_LEN_FIX,j*LOGGER_ENTRY_MAX_LEN_FIX));
                     if(!ret){
                         return ret;
                     }
                 }
 
-                ret = log(socketChannel,priority,tag,trace,kv[0].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
+                ret = log(priority,tag,trace,kv[0].substring((page-1)*LOGGER_ENTRY_MAX_LEN_FIX,length));
                 if(!ret){
                     return ret;
                 }
             }else{
-                ret = log(socketChannel,priority,tag,trace,kv[0]);
+                ret = log(priority,tag,trace,kv[0]);
                 if(!ret){
                     return ret;
                 }
@@ -133,7 +154,7 @@ public final class NetLogger implements ILog {
         return ret;
     }
 
-    private boolean log(SocketChannel socketChannel,String priority, String tag,String trace, String kv){
+    private boolean log(String priority, String tag,String trace, String kv){
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
         String time = sdf.format(new Date());
@@ -161,45 +182,9 @@ public final class NetLogger implements ILog {
             sb.append(kv);
         }
         sb.append(NEW_LINE);
-        ByteBuffer buf=ByteBuffer.wrap(sb.toString().getBytes());
-        try {
-            socketChannel.write(buf);
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
-    //------------------------------------------------------------
-    public class NetLogMessage extends AbsMessage {
-
-        public String priority;
-        public String tag;
-        public String trace;
-        public String []kvs;
-
-        public NetLogMessage(String priority, String tag, String trace, String[] kvs) {
-            this.priority = priority;
-            this.tag = tag;
-            this.trace = trace;
-            this.kvs = kvs;
-        }
-
-        @Override
-        public byte[] getPacket() {
-            return null;
-        }
-
-        @Override
-        public boolean write(OutputStream outStream) {
-            return false;
-        }
-
-        @Override
-        public boolean write(SocketChannel socketChannel) {
-            return println(socketChannel,priority,tag,trace,kvs);
-        }
+        mMessageProcessor.send(mNioClient,sb.toString().getBytes());
+        return true;
     }
 
 }
