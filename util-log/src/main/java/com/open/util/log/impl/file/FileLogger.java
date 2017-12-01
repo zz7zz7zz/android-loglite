@@ -22,132 +22,27 @@ public final class FileLogger implements ILog {
 
     @Override
     public void v(int priority, String tag, String trace, String... kv) {
-        if(syn){
-            mMessageQueen.add(new LogMessage(LOG_VERBOSE,tag,trace,kv));
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    if(mMessageQueen.isEmpty()){
-                        return;
-                    }
-
-                    openFile();
-                    while (!mMessageQueen.isEmpty()){
-                        LogMessage msg = mMessageQueen.poll();
-                        println(LOG_VERBOSE,msg.tag,msg.trace,msg.kvs);
-                    }
-                    closeFile();
-                }
-            });
-        }else{
-            openFile();
-            println(LOG_VERBOSE,tag,trace,kv);
-            closeFile();
-        }
+        printlnMessage(LOG_VERBOSE,tag,trace,kv);
     }
 
     @Override
     public void d(int priority, String tag, String trace, String... kv) {
-        if(syn){
-            mMessageQueen.add(new LogMessage(LOG_DEBUG,tag,trace,kv));
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    if(mMessageQueen.isEmpty()){
-                        return;
-                    }
-
-                    openFile();
-                    while (!mMessageQueen.isEmpty()){
-                        LogMessage msg = mMessageQueen.poll();
-                        println(LOG_DEBUG,msg.tag,msg.trace,msg.kvs);
-                    }
-                    closeFile();
-                }
-            });
-        }else{
-            openFile();
-            println(LOG_DEBUG,tag,trace,kv);
-            closeFile();
-        }
+        printlnMessage(LOG_DEBUG,tag,trace,kv);
     }
 
     @Override
     public void i(int priority, String tag, String trace, String... kv) {
-        if(syn){
-            mMessageQueen.add(new LogMessage(LOG_INFO,tag,trace,kv));
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    if(mMessageQueen.isEmpty()){
-                        return;
-                    }
-
-                    openFile();
-                    while (!mMessageQueen.isEmpty()){
-                        LogMessage msg = mMessageQueen.poll();
-                        println(LOG_INFO,msg.tag,msg.trace,msg.kvs);
-                    }
-                    closeFile();
-                }
-            });
-        }else{
-            openFile();
-            println(LOG_INFO,tag,trace,kv);
-            closeFile();
-        }
+        printlnMessage(LOG_INFO,tag,trace,kv);
     }
 
     @Override
     public void w(int priority, String tag, String trace, String... kv) {
-        if(syn){
-            mMessageQueen.add(new LogMessage(LOG_WARN,tag,trace,kv));
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    if(mMessageQueen.isEmpty()){
-                        return;
-                    }
-
-                    openFile();
-                    while (!mMessageQueen.isEmpty()){
-                        LogMessage msg = mMessageQueen.poll();
-                        println(LOG_WARN,msg.tag,msg.trace,msg.kvs);
-                    }
-                    closeFile();
-                }
-            });
-        }else{
-            openFile();
-            println(LOG_WARN,tag,trace,kv);
-            closeFile();
-        }
+        printlnMessage(LOG_WARN,tag,trace,kv);
     }
 
     @Override
     public void e(int priority, String tag, String trace, String... kv) {
-        if(syn){
-            mMessageQueen.add(new LogMessage(LOG_ERROR,tag,trace,kv));
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    if(mMessageQueen.isEmpty()){
-                        return;
-                    }
-
-                    openFile();
-                    while (!mMessageQueen.isEmpty()){
-                        LogMessage msg = mMessageQueen.poll();
-                        println(LOG_ERROR,msg.tag,msg.trace,msg.kvs);
-                    }
-                    closeFile();
-                }
-            });
-        }else{
-            openFile();
-            println(LOG_ERROR,tag,trace,kv);
-            closeFile();
-        }
+        printlnMessage(LOG_ERROR,tag,trace,kv);
     }
 
     //------------------------------------------------------------
@@ -171,6 +66,31 @@ public final class FileLogger implements ILog {
         this.fileSize = fileSize;
         this.syn = isSyn;
         initFile();
+    }
+
+    private void printlnMessage(final String priority, String tag, String trace, String... kv){
+        if(syn){
+            mMessageQueen.add(new LogMessage(priority,tag,trace,kv));
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if(mMessageQueen.isEmpty()){
+                        return;
+                    }
+
+                    openFile();
+                    while (!mMessageQueen.isEmpty()){
+                        LogMessage msg = mMessageQueen.poll();
+                        println(msg.priority,msg.tag,msg.trace,msg.kvs);
+                    }
+                    closeFile();
+                }
+            });
+        }else{
+            openFile();
+            println(priority,tag,trace,kv);
+            closeFile();
+        }
     }
 
     private void println(String priority, String tag, String trace, String... kv){
