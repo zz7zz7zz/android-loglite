@@ -1,7 +1,10 @@
 package com.open.net.client.impl.bio;
 
+import com.open.net.client.impl.nio.NioConnector;
 import com.open.net.client.structures.BaseClient;
 import com.open.net.client.structures.BaseMessageProcessor;
+import com.open.net.client.structures.IConnectListener;
+import com.open.net.client.structures.TcpAddress;
 import com.open.net.client.structures.message.Message;
 
 import java.io.IOException;
@@ -15,23 +18,16 @@ import java.net.SocketException;
  * created on   :   2017/11/30
  * description  :   BioClient
  */
-public class BioClient extends BaseClient {
+public class BioClient extends BaseClient{
 
 	private final String TAG = "BioClient";
-
-	public BioClient(BaseMessageProcessor mMessageProcessor) {
-		super(mMessageProcessor);
-	}
 
 	//-------------------------------------------------------------------------------------------
 	private BioConnector mConnector;
 
-	public BioConnector getConnector() {
-		return mConnector;
-	}
-
-	public void setConnector(BioConnector mBioConnector) {
-		this.mConnector = mBioConnector;
+	public BioClient(BaseMessageProcessor mMessageProcessor, IConnectListener mConnectListener) {
+		super(mMessageProcessor);
+		mConnector = new BioConnector(this,mConnectListener);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -155,5 +151,26 @@ public class BioClient extends BaseClient {
 		}
 
 		return writeRet;
+	}
+
+	//-------------------------------------------------------------------------------------------
+	public void setConnectAddress(TcpAddress[] tcpArray ){
+		mConnector.setConnectAddress(tcpArray);
+	}
+
+	public void setConnectTimeout(long connect_timeout ){
+		mConnector.setConnectTimeout(connect_timeout);
+	}
+
+	public void connect(){
+		mConnector.connect();
+	}
+
+	public void disconnect(){
+		mConnector.disconnect();
+	}
+
+	public void reconnect(){
+		mConnector.reconnect();
 	}
 }
