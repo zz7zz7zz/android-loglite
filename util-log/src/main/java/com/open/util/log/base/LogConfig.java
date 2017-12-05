@@ -23,7 +23,7 @@ import java.util.HashMap;
  <br/> enable = true                                           #配置总开关
  <br/>
  <br/>[Common]
- <br/>common_mode  = 1                                        #0x1代表控制台；0x2代表文件；0x4代表网络
+ <br/>common_mode  = 1                                        #0x1代表控制台；0x2代表文件；0x4代表Tcp日志；0x8代表Udp日志
  <br/>common_level = 2                                        #取值有>2;<2;=2 ;     另外2:v日志; 3:d日志;  4:I日志;  5:w日志;  6:e日志
  <br/>common_author= [A,B]                                    #代表AB两个人才可以打日志，其它人的日志不可见
  <br/>common_authorGroup=[A,B,C,D,E]                          #A,B,C,D,E 代表5个人
@@ -52,7 +52,8 @@ public final class LogConfig {
 
     public static final int LOG_MODE_CONSOLE = 0x1;
     public static final int LOG_MODE_FILE    = 0x2;
-    public static final int LOG_MODE_NET     = 0x4;
+    public static final int LOG_MODE_NET_TCP = 0x4;
+    public static final int LOG_MODE_NET_UDP = 0x8;
 
     public static final int LOG_LEVEL_VERBOSE = 2;
     public static final int LOG_LEVEL_DEBUG   = 3;

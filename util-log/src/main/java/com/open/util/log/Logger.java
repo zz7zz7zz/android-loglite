@@ -3,11 +3,12 @@ package com.open.util.log;
 import android.content.Context;
 import android.os.Process;
 
-import com.open.util.log.base.LogConfig;
 import com.open.util.log.base.ILog;
+import com.open.util.log.base.LogConfig;
 import com.open.util.log.impl.console.ConsLogger;
 import com.open.util.log.impl.file.FileLogger;
-import com.open.util.log.impl.net.NetLogger;
+import com.open.util.log.impl.net.TcpLogger;
+import com.open.util.log.impl.net.UdpLogger;
 
 import java.util.ArrayList;
 
@@ -36,8 +37,12 @@ public final class Logger{
                     mLogger.addLogger(new FileLogger(fileLogPath,mLogConfig.file_name_formater,mLogConfig.file_size,mLogConfig.file_syn));
                 }
 
-                if((mLogConfig.common_mode & LogConfig.LOG_MODE_NET) == LogConfig.LOG_MODE_NET){
-                    mLogger.addLogger(new NetLogger(mLogConfig.net_tcp));
+                if((mLogConfig.common_mode & LogConfig.LOG_MODE_NET_TCP) == LogConfig.LOG_MODE_NET_TCP){
+                    mLogger.addLogger(new TcpLogger(mLogConfig.net_tcp));
+                }
+
+                if((mLogConfig.common_mode & LogConfig.LOG_MODE_NET_UDP) == LogConfig.LOG_MODE_NET_UDP){
+                    mLogger.addLogger(new UdpLogger(mLogConfig.net_udp));
                 }
             }else{
                 destroy();

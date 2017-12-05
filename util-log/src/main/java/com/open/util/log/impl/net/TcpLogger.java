@@ -16,7 +16,7 @@ import java.util.LinkedList;
  * Created by long on 2017/9/13.
  */
 
-public final class NetLogger implements ILog {
+public final class TcpLogger implements ILog {
 
     @Override
     public void v(int priority, String tag, String trace, String... kv) {
@@ -56,7 +56,7 @@ public final class NetLogger implements ILog {
         }
     };
 
-    public NetLogger(TcpAddress[] tcpArray) {
+    public TcpLogger(TcpAddress[] tcpArray) {
         mNioClient = new NioClient(mMessageProcessor,null);
         mNioClient.setConnectAddress(tcpArray);
     }
