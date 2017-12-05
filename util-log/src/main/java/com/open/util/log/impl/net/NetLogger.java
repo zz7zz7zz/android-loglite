@@ -1,10 +1,8 @@
 package com.open.util.log.impl.net;
 
-import com.open.net.client.impl.nio.NioClient;
-import com.open.net.client.impl.nio.NioConnector;
+import com.open.net.client.impl.tcp.nio.NioClient;
 import com.open.net.client.structures.BaseClient;
 import com.open.net.client.structures.BaseMessageProcessor;
-import com.open.net.client.structures.IConnectResultListener;
 import com.open.net.client.structures.TcpAddress;
 import com.open.net.client.structures.message.Message;
 import com.open.util.log.base.ILog;
@@ -48,17 +46,7 @@ public final class NetLogger implements ILog {
     //------------------------------------------------------------
     private StringBuilder builder = new StringBuilder(128);
     private NioClient mNioClient ;
-    private IConnectResultListener mConnectResultListener = new IConnectResultListener() {
-        @Override
-        public void onConnectionSuccess() {
 
-        }
-
-        @Override
-        public void onConnectionFailed() {
-            mNioClient.getConnector().connect();//try to connect next ip port
-        }
-    };
 
     private BaseMessageProcessor mMessageProcessor =new BaseMessageProcessor() {
 
@@ -69,8 +57,8 @@ public final class NetLogger implements ILog {
     };
 
     public NetLogger(TcpAddress[] tcpArray) {
-        mNioClient = new NioClient(mMessageProcessor);
-        mNioClient.setConnector(new NioConnector(mNioClient,tcpArray, mConnectResultListener));
+        mNioClient = new NioClient(mMessageProcessor,null);
+        mNioClient.setConnectAddress(tcpArray);
     }
 
     //------------------------------------------------------------

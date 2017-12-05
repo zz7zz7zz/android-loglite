@@ -1,13 +1,13 @@
-package com.open.net.client.impl.nio;
+package com.open.net.client.impl.tcp.nio;
 
 import com.open.net.client.structures.BaseClient;
 import com.open.net.client.structures.BaseMessageProcessor;
+import com.open.net.client.structures.IConnectListener;
+import com.open.net.client.structures.TcpAddress;
 import com.open.net.client.structures.message.Message;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -20,30 +20,21 @@ public final class NioClient extends BaseClient {
 
     private final String TAG="NioClient";
 
-    public NioClient(BaseMessageProcessor mMessageProcessor) {
-        super(mMessageProcessor);
-    }
-
     //-------------------------------------------------------------------------------------------
     private NioConnector mConnector;
 
-    public NioConnector getConnector() {
-        return mConnector;
-    }
-
-    public void setConnector(NioConnector mConnector) {
-        this.mConnector = mConnector;
+    public NioClient(BaseMessageProcessor mMessageProcessor, IConnectListener mConnectListener) {
+        super(mMessageProcessor);
+        mConnector = new NioConnector(this,mConnectListener);
     }
 
     //-------------------------------------------------------------------------------------------
     private SocketChannel mSocketChannel;
-    private Selector   mSelector;
     private ByteBuffer mReadByteBuffer  = ByteBuffer.allocate(64*1024);
     private ByteBuffer mWriteByteBuffer = ByteBuffer.allocate(64*1024);
 
-    public void init(SocketChannel socketChannel,Selector   mSelector) {
+    public void init(SocketChannel socketChannel) {
         this.mSocketChannel = socketChannel;
-        this.mSelector = mSelector;
     }
 
     @Override
@@ -53,21 +44,7 @@ public final class NioClient extends BaseClient {
 
     @Override
     public void onClose() {
-        if(null!= mSocketChannel) {
-            try {
-                SelectionKey key = mSocketChannel.keyFor(mSelector);
-                if(null != key){
-                    key.cancel();
-                }
-                mSelector.close();
-                mSocketChannel.socket().close();
-                mSocketChannel.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
         mSocketChannel = null;
-        mSelector = null;
     }
 
     public boolean onRead() {
@@ -157,7 +134,7 @@ public final class NioClient extends BaseClient {
                         }
                     }
                 }else{
-                    mWriteByteBuffer.put(msg.data,0,msg.length);
+                    mWriteByteBuffer.put(msg.data,msg.offset,msg.length);
                     mWriteByteBuffer.flip();
 
                     int writtenLength      = mSocketChannel.write(mWriteByteBuffer);//客户端关闭连接后，此处将抛出异常
@@ -195,6 +172,23 @@ public final class NioClient extends BaseClient {
     }
 
     //-------------------------------------------------------------------------------------------
+    public void setConnectAddress(TcpAddress[] tcpArray ){
+        mConnector.setConnectAddress(tcpArray);
+    }
 
+    public void setConnectTimeout(long connect_timeout ){
+        mConnector.setConnectTimeout(connect_timeout);
+    }
 
+    public void connect(){
+        mConnector.connect();
+    }
+
+    public void disconnect(){
+        mConnector.disconnect();
+    }
+
+    public void reconnect(){
+        mConnector.reconnect();
+    }
 }
