@@ -2,6 +2,7 @@ package com.open.util.log;
 
 import android.content.Context;
 import android.os.Process;
+import android.util.Log;
 
 import com.open.util.log.base.ILog;
 import com.open.util.log.base.LogConfig;
@@ -9,6 +10,9 @@ import com.open.util.log.impl.console.ConsLogger;
 import com.open.util.log.impl.file.FileLogger;
 import com.open.util.log.impl.net.TcpLogger;
 import com.open.util.log.impl.net.UdpLogger;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -65,8 +69,8 @@ public final class Logger{
     }
 
     //------------------------------------------
-    public static void v(String author , String tag , String... kv) {
-        if(null == mLogger || null == mLogConfig|| !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_VERBOSE)){
+    public static void v(String author , String tag , Object... kv) {
+        if(null == mLogger || kv.length == 0 || null == mLogConfig ||!mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_VERBOSE)){
             return;
         }
 
@@ -78,14 +82,15 @@ public final class Logger{
             }
         }
 
+        String[] logKv = transformMessage(kv);
         int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.mLoggerList.get(i).v(LogConfig.LOG_LEVEL_VERBOSE,tag,trace,kv);
+            mLogger.mLoggerList.get(i).v(LogConfig.LOG_LEVEL_VERBOSE,tag,trace,logKv);
         }
     }
 
-    public static void d(String author , String tag  , String... kv) {
-        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_DEBUG)){
+    public static void d(String author , String tag  , Object... kv) {
+        if(null == mLogger || kv.length == 0 || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_DEBUG)){
             return;
         }
 
@@ -97,14 +102,15 @@ public final class Logger{
             }
         }
 
+        String[] logKv = transformMessage(kv);
         int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.mLoggerList.get(i).d(LogConfig.LOG_LEVEL_DEBUG,tag,trace,kv);
+            mLogger.mLoggerList.get(i).d(LogConfig.LOG_LEVEL_DEBUG,tag,trace,logKv);
         }
     }
 
-    public static void i(String author  , String tag , String... kv) {
-        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_INFO)){
+    public static void i(String author  , String tag , Object... kv) {
+        if(null == mLogger || kv.length == 0 || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_INFO)){
             return;
         }
 
@@ -116,14 +122,15 @@ public final class Logger{
             }
         }
 
+        String[] logKv = transformMessage(kv);
         int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.mLoggerList.get(i).i(LogConfig.LOG_LEVEL_INFO,tag,trace,kv);
+            mLogger.mLoggerList.get(i).i(LogConfig.LOG_LEVEL_INFO,tag,trace,logKv);
         }
     }
 
-    public static void w(String author , String tag  , String... kv) {
-        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_WARN)){
+    public static void w(String author , String tag  , Object... kv) {
+        if(null == mLogger || kv.length == 0 || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_WARN)){
             return;
         }
 
@@ -135,14 +142,15 @@ public final class Logger{
             }
         }
 
+        String[] logKv = transformMessage(kv);
         int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.mLoggerList.get(i).w(LogConfig.LOG_LEVEL_WARN,tag,trace,kv);
+            mLogger.mLoggerList.get(i).w(LogConfig.LOG_LEVEL_WARN,tag,trace,logKv);
         }
     }
 
-    public static  void e(String author  , String tag , String... kv) {
-        if(null == mLogger || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_ERROR)){
+    public static  void e(String author  , String tag , Object... kv) {
+        if(null == mLogger || kv.length == 0 || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_ERROR)){
             return;
         }
 
@@ -154,9 +162,10 @@ public final class Logger{
             }
         }
 
+        String[] logKv = transformMessage(kv);
         int size = mLogger.mLoggerList.size();
         for (int i = 0; i < size; i++) {
-            mLogger.mLoggerList.get(i).e(LogConfig.LOG_LEVEL_ERROR,tag,trace,kv);
+            mLogger.mLoggerList.get(i).e(LogConfig.LOG_LEVEL_ERROR,tag,trace,logKv);
         }
     }
 
@@ -189,5 +198,42 @@ public final class Logger{
         return false;
     }
 
+    //-----------------------------格式化数据--------------------------------------
+    private static final int JSON_INDENT = 2;
+    private static String[] transformMessage(Object[] input){
+        boolean isFindNonStringObject = false;
+        for (int i = 0 ;i < input.length; i++){
+            if(!(input[i] instanceof String)){
+                isFindNonStringObject = true;
+                break;
+            }
+        }
+        if(!isFindNonStringObject){
+            return (String[]) input;
+        }
+        String[] ret = new String[input.length];
+        for (int i = 0 ;i < input.length; i++){
+            ret[i] = transformMessage(input[i]);
+        }
+        return ret;
+    }
 
+    private static String transformMessage(Object input){
+        try{
+            if(input instanceof String){
+                return (String) input;
+            }else if(input instanceof JSONObject){
+                JSONObject jsonObject = (JSONObject) input;
+                return jsonObject.toString(JSON_INDENT);
+            }else if(input instanceof JSONArray){
+                JSONArray jsonArray = (JSONArray) input;
+                return jsonArray.toString(JSON_INDENT);
+            }else if (input instanceof Throwable) {
+                return Log.getStackTraceString((Throwable) input);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null != input ? input.toString() : "Null";
+    }
 }
