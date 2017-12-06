@@ -10,6 +10,10 @@ import android.view.View;
 import com.open.util.log.Logger;
 import com.open.util.log.base.LogConfig;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 
 public class MainActivity extends Activity {
@@ -32,7 +36,44 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
+                //-------------------------1.测试字符串-------------------------------
                 Logger.v("A",TAG,"onCreate " + (++count));
+
+                //-------------------------2.测试JSON对象-------------------------------
+                try {
+                    JSONObject mJSONObject = new JSONObject();
+                    mJSONObject.put("name","yang");
+                    mJSONObject.put("age",18);
+
+                    Logger.v("A",TAG,mJSONObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //-------------------------3.测试JSON数组-------------------------------
+                try {
+                    JSONArray mJSONArray = new JSONArray();
+                    for (int i = 0;i<5;i++){
+                        JSONObject mJSONObject = new JSONObject();
+                        mJSONObject.put("name","yang " + i);
+                        mJSONObject.put("age",18+i);
+                        mJSONArray.put(mJSONObject);
+                    }
+
+                    Logger.v("A",TAG,mJSONArray);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //-------------------------4.测试异常-------------------------------
+                try {
+                    String str = null;
+                    str.equals("null");
+                } catch (Exception e) {
+//                    e.printStackTrace();
+                    Logger.v("A",TAG,e);
+                }
+
 //                Logger.v("C",TAG,"onCreate " + (++count));
 
 //                new Thread(new Runnable() {

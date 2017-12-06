@@ -198,19 +198,9 @@ public final class Logger{
         return false;
     }
 
-    //-----------------------------格式化数据--------------------------------------
+    //-------------------------------------------------------------------
     private static final int JSON_INDENT = 2;
     private static String[] transformMessage(Object[] input){
-        boolean isFindNonStringObject = false;
-        for (int i = 0 ;i < input.length; i++){
-            if(!(input[i] instanceof String)){
-                isFindNonStringObject = true;
-                break;
-            }
-        }
-        if(!isFindNonStringObject){
-            return (String[]) input;
-        }
         String[] ret = new String[input.length];
         for (int i = 0 ;i < input.length; i++){
             ret[i] = transformMessage(input[i]);
