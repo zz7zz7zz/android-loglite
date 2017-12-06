@@ -44,7 +44,7 @@ public final class TcpLogger implements ILog {
     }
 
     //------------------------------------------------------------
-    private StringBuilder builder = new StringBuilder(128);
+    private StringBuilder builder = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX/2);
     private NioClient mNioClient ;
 
 

@@ -41,7 +41,7 @@ public final class ConsLogger implements ILog {
     private static final int LOG_LOGCAT = 2;
 
     private int console_log_type = LOG_LOGCAT;
-    private StringBuilder builder = new StringBuilder(128);
+    private StringBuilder builder = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX/2);
 
     public ConsLogger(int console_log_type) {
         this.console_log_type = console_log_type;

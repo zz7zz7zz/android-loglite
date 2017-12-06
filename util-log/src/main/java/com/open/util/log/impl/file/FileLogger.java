@@ -57,7 +57,7 @@ public final class FileLogger implements ILog {
     private String  writtenFileName;
     private ConcurrentLinkedQueue<LogMessage> mMessageQueen = new ConcurrentLinkedQueue();
     private ThreadPoolExecutor executor = new ThreadPoolExecutor(0,1,60L, TimeUnit.SECONDS,new LinkedBlockingDeque<Runnable>(1), new ThreadPoolExecutor.DiscardPolicy());
-    private StringBuilder builder = new StringBuilder(128);
+    private StringBuilder builder = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX/2);
     //------------------------------------------------------------
 
     public FileLogger(String logPath , String fileNameFormater, long fileSize , boolean isSyn) {

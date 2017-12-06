@@ -6,7 +6,7 @@ package com.open.util.log.base;
 
 public interface ILog {
 
-    int LOGGER_ENTRY_MAX_LEN    =    (4*1024);
+    int LOGGER_ENTRY_MAX_LEN    =    (4*1024);//单条log最长为4K
     int LOGGER_ENTRY_MAX_LEN_FIX= LOGGER_ENTRY_MAX_LEN / 4;
     String NEW_LINE = System.getProperty("line.separator");
 
