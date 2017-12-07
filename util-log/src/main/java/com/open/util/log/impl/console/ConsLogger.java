@@ -36,6 +36,16 @@ public final class ConsLogger implements ILog {
         println(priority,tag,trace,kv);
     }
 
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void stop() {
+
+    }
+
     //------------------------------------------------------------
     private static final int LOG_SYSTEM = 1;
     private static final int LOG_LOGCAT = 2;

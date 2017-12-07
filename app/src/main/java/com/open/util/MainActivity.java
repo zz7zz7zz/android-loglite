@@ -15,18 +15,14 @@ import java.io.File;
 public class MainActivity extends Activity {
 
     private String TAG = "MainActivity";
-    static boolean isInited = false;
     static int count = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(!isInited){
-            LogConfig mConfig = Logger.init(this,"log_config",getDiskCacheDir(this));
-            System.out.println(mConfig);
-            isInited = true;
-        }
+        LogConfig mConfig = Logger.init(this,"log_config",getDiskCacheDir(this));
+        System.out.println(mConfig);
 
         findViewById(R.id.log_text).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,5 +106,11 @@ public class MainActivity extends Activity {
             cachePath = mContext.getCacheDir().getPath();
         }
         return cachePath + File.separator;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Logger.destroy();
     }
 }

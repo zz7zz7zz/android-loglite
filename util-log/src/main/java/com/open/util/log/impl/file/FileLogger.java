@@ -45,6 +45,18 @@ public final class FileLogger implements ILog {
         printlnMessage(LOG_ERROR,tag,trace,kv);
     }
 
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void stop() {
+        mMessageQueen.clear();
+        executor.shutdown();
+        closeFile();
+    }
+
     //------------------------------------------------------------
     private final String    fileSavePath;
     private final String    fileNameFormater;//命名规则

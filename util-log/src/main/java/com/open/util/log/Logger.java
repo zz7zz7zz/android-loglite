@@ -25,40 +25,54 @@ public final class Logger{
     private ArrayList<ILog> mLoggerList = new ArrayList<>();
     private static Logger mLogger;
     private static LogConfig mLogConfig;
+    private static boolean isInited = false;
 
     //------------------------------------------
     public static LogConfig init(Context mContext, String assetFileName, String fileLogPath){
-        mLogConfig = LogConfig.parse(mContext,assetFileName);
-        if(null != mLogConfig){
-            if(mLogConfig.isEnable) {
-                mLogger = new Logger();
+        if(!isInited){
+            mLogConfig = LogConfig.parse(mContext,assetFileName);
+            if(null != mLogConfig){
+                if(mLogConfig.isEnable) {
+                    mLogger = new Logger();
 
-                if((mLogConfig.common_mode & LogConfig.LOG_MODE_CONSOLE) == LogConfig.LOG_MODE_CONSOLE){
-                    mLogger.addLogger(new ConsLogger(mLogConfig.console_log_type));
-                }
+                    if((mLogConfig.common_mode & LogConfig.LOG_MODE_CONSOLE) == LogConfig.LOG_MODE_CONSOLE){
+                        mLogger.addLogger(new ConsLogger(mLogConfig.console_log_type));
+                    }
 
-                if((mLogConfig.common_mode & LogConfig.LOG_MODE_FILE) == LogConfig.LOG_MODE_FILE){
-                    mLogger.addLogger(new FileLogger(fileLogPath,mLogConfig.file_name_formater,mLogConfig.file_size,mLogConfig.file_syn));
-                }
+                    if((mLogConfig.common_mode & LogConfig.LOG_MODE_FILE) == LogConfig.LOG_MODE_FILE){
+                        mLogger.addLogger(new FileLogger(fileLogPath,mLogConfig.file_name_formater,mLogConfig.file_size,mLogConfig.file_syn));
+                    }
 
-                if((mLogConfig.common_mode & LogConfig.LOG_MODE_NET_TCP) == LogConfig.LOG_MODE_NET_TCP){
-                    mLogger.addLogger(new TcpLogger(mLogConfig.net_tcp));
-                }
+                    if((mLogConfig.common_mode & LogConfig.LOG_MODE_NET_TCP) == LogConfig.LOG_MODE_NET_TCP){
+                        mLogger.addLogger(new TcpLogger(mLogConfig.net_tcp));
+                    }
 
-                if((mLogConfig.common_mode & LogConfig.LOG_MODE_NET_UDP) == LogConfig.LOG_MODE_NET_UDP){
-                    mLogger.addLogger(new UdpLogger(mLogConfig.net_udp));
+                    if((mLogConfig.common_mode & LogConfig.LOG_MODE_NET_UDP) == LogConfig.LOG_MODE_NET_UDP){
+                        mLogger.addLogger(new UdpLogger(mLogConfig.net_udp));
+                    }
+
+                    mLogger.start();
+
+                }else{
+                    destroy();
                 }
-            }else{
+            } else{
                 destroy();
             }
-        } else{
-            destroy();
+            isInited = true;
         }
-
         return mLogConfig;
     }
 
+    public static LogConfig updateConfig(Context mContext, String assetFileName, String fileLogPath){
+        isInited = false;
+        return init(mContext,assetFileName,fileLogPath);
+    }
+
     public static void destroy(){
+        if(null != mLogger){
+            mLogger.stop();
+        }
         mLogConfig = null;
         mLogger = null;
     }
@@ -66,6 +80,19 @@ public final class Logger{
     //------------------------------------------
     private void addLogger(ILog logger){
         mLoggerList.add(logger);
+    }
+
+    private void start(){
+        for (ILog logger : mLogger.mLoggerList){
+            logger.start();
+        }
+    }
+
+    private void stop(){
+        for (ILog logger : mLogger.mLoggerList){
+            logger.stop();
+        }
+        mLogger = null;
     }
 
     //------------------------------------------

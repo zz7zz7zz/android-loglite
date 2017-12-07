@@ -33,4 +33,8 @@ public interface ILog {
 
     void e(int priority , String tag , String trace , String ... kv);
 
+    void start();
+
+    void stop();
+
 }

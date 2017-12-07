@@ -43,6 +43,16 @@ public final class UdpLogger implements ILog {
         println(LOG_ERROR,tag,trace,kv);
     }
 
+    @Override
+    public void start() {
+        mNioClient.connect();
+    }
+
+    @Override
+    public void stop() {
+        mNioClient.disconnect();
+    }
+
     //------------------------------------------------------------
     private StringBuilder builder = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX/2);
     private UdpNioClient mNioClient ;
