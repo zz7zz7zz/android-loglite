@@ -62,7 +62,3 @@ Logger.v("Author", TAG ,"your msg!)");
 ![](https://github.com/zz7zz7zz/android-loglite/blob/master/log_udp.png "网络UDP打印效果") 
 
 
-------------------------------- so easy -------------------------------
-
-
-
