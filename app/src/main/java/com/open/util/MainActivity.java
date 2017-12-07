@@ -30,7 +30,8 @@ public class MainActivity extends Activity {
 
                 //-------------------------1.测试字符串-------------------------------
                 Logger.v("A",TAG,"onCreate " + (++count));
-
+                Logger.v("C",TAG,"onCreate " + (++count));
+                Logger.d("A",TAG,"onCreate " + (++count));
 //                //-------------------------2.测试JSON对象-------------------------------
 //                try {
 //                    JSONObject mJSONObject = new JSONObject();
