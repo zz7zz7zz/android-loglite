@@ -60,6 +60,11 @@ public final class Logger{
                 destroy();
             }
             isInited = true;
+        }else{
+            //有可能有网络连接，再次初始化一次
+            if(null != mLogger){
+                mLogger.start();
+            }
         }
         return mLogConfig;
     }
@@ -75,6 +80,7 @@ public final class Logger{
         }
         mLogConfig = null;
         mLogger = null;
+        isInited = false;
     }
 
     //------------------------------------------
