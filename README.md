@@ -19,7 +19,7 @@ android-loglite是一个轻量级的用于android上的日志打印库，打印�
     enable = true                                           #配置总开关
     
     [Common]
-    common_mode  = 7                                        #0x1代表控制台；0x2代表文件；0x4代表网络
+    common_mode  = 15                                       #0x1代表控制台；0x2代表文件；0x4代表Tcp网络；0x8代表Udp
     common_level = 2                                        #取值有>2;<2;=2 ;     另外2:v日志; 3:d日志;  4:I日志;  5:w日志;  6:e日志
     common_author= [A,B]                                    #代表AB两个人才可以打日志，其它人的日志不可见
     common_authorGroup=[A,B,C,D,E]                          #A,B,C,D,E 代表5个人
@@ -57,11 +57,8 @@ Logger.v("Author", TAG ,"your msg!)");
 
 ![](https://github.com/zz7zz7zz/android-loglite/blob/master/log_file.png "文件打印效果") 
 
-![](https://github.com/zz7zz7zz/android-loglite/blob/master/log_net.png "网络打印效果")  
+![](https://github.com/zz7zz7zz/android-loglite/blob/master/log_tcp.png "网络TCP打印效果")  
 
-
-
-------------------------------- so easy -------------------------------
-
+![](https://github.com/zz7zz7zz/android-loglite/blob/master/log_udp.png "网络UDP打印效果") 
 
 
