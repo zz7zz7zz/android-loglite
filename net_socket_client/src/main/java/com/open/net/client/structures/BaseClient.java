@@ -40,10 +40,10 @@ public abstract class BaseClient {
     }
 
     public void onReceiveMessageClear(){
-        Message msg = mReadMessageQueen.mMessageQueen.poll();
+        Message msg = mReadMessageQueen.mReadQueen.poll();
         while (null != msg){
             mReadMessageQueen.remove(msg);
-            msg = mReadMessageQueen.mMessageQueen.poll();
+            msg = mReadMessageQueen.mReadQueen.poll();
         }
     }
 
@@ -55,7 +55,7 @@ public abstract class BaseClient {
     }
 
     protected Message pollWriteMessage(){
-        return mWriteMessageQueen.mMessageQueen.poll();
+        return mWriteMessageQueen.mWriteQueen.poll();
     }
 
     protected void removeWriteMessage(Message msg){

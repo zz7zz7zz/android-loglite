@@ -1,7 +1,7 @@
 package com.open.net.client.impl.tcp.bio.processor;
 
 import com.open.net.client.structures.BaseClient;
-import com.open.net.client.impl.tcp.bio.IBioConnectListener;
+import com.open.net.client.impl.tcp.bio.ITcpBioConnectListener;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,16 +16,19 @@ import java.net.Socket;
 
 public class SocketProcessor {
 
+    private String TAG = "SocketProcessor";
+
     private static int G_SOCKET_ID = 0;
 
-    private int mSocketId;
-    private String mIp    = "192.168.1.1";
-    private int    mPort  = 9999;
-    private long   connect_timeout = 10000;
+    private int     mSocketId;
+    private String  mIp             = "192.168.1.1";
+    private int     mPort           = 9999;
+    private long    connect_timeout = 10000;
 
     private BaseClient mClient;
-    private IBioConnectListener mConnectStatusListener;
+    private ITcpBioConnectListener mConnectStatusListener;
 
+    //------------------------------------------------------------------------------------------
     private Socket mSocket =null;
     private OutputStream mOutputStream =null;
     private InputStream mInputStream =null;
@@ -40,16 +43,18 @@ public class SocketProcessor {
 
     private int r_w_count = 2;//读写线程是否都退出了
 
-    public SocketProcessor(String mIp, int mPort,long   connect_timeout, BaseClient mClient,IBioConnectListener mConnectionStatusListener) {
+    public SocketProcessor(String mIp, int mPort,long   connect_timeout, BaseClient mClient,ITcpBioConnectListener mConnectionStatusListener) {
+        G_SOCKET_ID++;
+
+        this.mSocketId = G_SOCKET_ID;
         this.mIp = mIp;
         this.mPort = mPort;
         this.connect_timeout = connect_timeout;
         this.mClient = mClient;
         this.mConnectStatusListener = mConnectionStatusListener;
-        G_SOCKET_ID++;
-        mSocketId = G_SOCKET_ID;
     }
 
+    //------------------------------------------------------------------------------------------
     public void start(){
         mConnectProcessor = new ConnectRunnable();
         mConnectThread = new Thread(mConnectProcessor);
@@ -121,7 +126,7 @@ public class SocketProcessor {
 
         --r_w_count;
         boolean isWriterReaderExit = (r_w_count <= 0);
-        System.out.println("client mSocketId " + mSocketId + " onClose when " + (exit_code == 1 ? "onWrite" : "onRead") + " isWriterReaderExit " + isWriterReaderExit);
+        System.out.println(TAG + "onSocketExit mSocketId " + mSocketId + " exit_code " + exit_code + (exit_code == 1 ? " onWrite" : " onRead")+ " isWriterReaderExit " + isWriterReaderExit);
         close();
         if(isWriterReaderExit){
             if(null != mConnectStatusListener){
@@ -154,7 +159,7 @@ public class SocketProcessor {
                 mReadThread.start();
 
                 if(null != mConnectStatusListener){
-                    mConnectStatusListener.onConnectSuccess(SocketProcessor.this,mSocket,mOutputStream,mInputStream);
+                    mConnectStatusListener.onConnectSuccess(SocketProcessor.this,mOutputStream,mInputStream);
                 }
                 connectRet = true;
             } catch (Exception e) {

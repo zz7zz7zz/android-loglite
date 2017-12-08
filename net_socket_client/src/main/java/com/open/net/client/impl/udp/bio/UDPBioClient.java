@@ -1,5 +1,6 @@
 package com.open.net.client.impl.udp.bio;
 
+import com.open.net.client.GClient;
 import com.open.net.client.structures.BaseClient;
 import com.open.net.client.structures.BaseMessageProcessor;
 import com.open.net.client.structures.IConnectListener;
@@ -15,14 +16,18 @@ import java.net.DatagramSocket;
  * description  :   UDP 客户端
  */
 
-public class UDPBioClient extends BaseClient{
+public class UdpBioClient extends BaseClient{
+
+    static {
+        GClient.init();
+    }
 
     //-------------------------------------------------------------------------------------------
-    private UDPBioConnector mConnector;
+    private UdpBioConnector mConnector;
 
-    public UDPBioClient(BaseMessageProcessor mMessageProcessor, IConnectListener mConnectListener) {
+    public UdpBioClient(BaseMessageProcessor mMessageProcessor, IConnectListener mConnectListener) {
         super(mMessageProcessor);
-        mConnector = new UDPBioConnector(this,mConnectListener);
+        mConnector = new UdpBioConnector(this,mConnectListener);
     }
     //-------------------------------------------------------------------------------------------
     public void setConnectAddress(UdpAddress[] tcpArray ){
@@ -46,7 +51,7 @@ public class UDPBioClient extends BaseClient{
     private DatagramPacket mWriteDatagramPacket ;
     private DatagramPacket mReadDatagramPacket ;
     public byte[] mWriteBuff  = new byte[65500];
-    public byte[] mReadBuff  = new byte[65500];
+    public byte[] mReadBuff   = new byte[65500];
 
     public void init(DatagramSocket mSocket, DatagramPacket mWriteDatagramPacket, DatagramPacket mReadDatagramPacket){
         this.mSocket = mSocket;
@@ -72,9 +77,8 @@ public class UDPBioClient extends BaseClient{
                 if(null!= mMessageProcessor) {
                     mMessageProcessor.onReceiveData(this, mReadDatagramPacket.getData(),mReadDatagramPacket.getOffset(),mReadDatagramPacket.getLength());
                     mMessageProcessor.onReceiveMessages(this);
-
-                    mReadDatagramPacket.setLength(mReadDatagramPacket.getData().length);
                 }
+                mReadDatagramPacket.setLength(mReadDatagramPacket.getData().length);
             }
         } catch (Exception e) {
             e.printStackTrace();

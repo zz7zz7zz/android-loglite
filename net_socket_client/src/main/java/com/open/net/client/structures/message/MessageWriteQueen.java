@@ -10,8 +10,8 @@ import java.util.LinkedList;
 
 public final class MessageWriteQueen {
 
-    private MessageBuffer       mWriteMessageBuffer = new MessageBuffer();//消息缓存
-    public  LinkedList<Message> mMessageQueen       = new LinkedList<>();//真正的消息队列
+    private MessageBuffer       mWriteMessageBuffer = new MessageBuffer();
+    public  LinkedList<Message> mWriteQueen         = new LinkedList<>();//真正的消息队列
 
     public Message build(byte[] src , int offset , int length){
         Message msg = mWriteMessageBuffer.build(src,offset,length);
@@ -20,13 +20,13 @@ public final class MessageWriteQueen {
 
     public void add(Message msg){
         if(null != msg){
-            mMessageQueen.add(msg);
+            mWriteQueen.add(msg);
         }
     }
 
     public void remove(Message msg){
         if(null != msg){
-            mMessageQueen.remove(msg);
+            mWriteQueen.remove(msg);
             mWriteMessageBuffer.release(msg);
         }
     }

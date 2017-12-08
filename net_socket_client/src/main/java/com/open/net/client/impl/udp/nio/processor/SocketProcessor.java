@@ -19,12 +19,13 @@ import java.util.Iterator;
 
 public final class SocketProcessor {
 
+    private String TAG = "SocketProcessor";
+
     private static int G_SOCKET_ID = 0;
 
     private int mSocketId;
     private String  mIp ="192.168.1.1";
     private int     mPort =9999;
-    private long   connect_timeout = 10000;
 
     private BaseClient mClient;
     private IUdpNioConnectListener mNioConnectListener;
@@ -37,14 +38,14 @@ public final class SocketProcessor {
 
     private boolean closed = false;
 
-    public SocketProcessor(String mIp, int mPort, long   connect_timeout , BaseClient mClient, IUdpNioConnectListener mNioConnectListener) {
+    public SocketProcessor(String mIp, int mPort , BaseClient mClient, IUdpNioConnectListener mNioConnectListener) {
+        G_SOCKET_ID++;
+
+        this.mSocketId = G_SOCKET_ID;
         this.mIp = mIp;
         this.mPort = mPort;
-        this.connect_timeout = connect_timeout;
         this.mClient = mClient;
         this.mNioConnectListener = mNioConnectListener;
-        G_SOCKET_ID++;
-        mSocketId = G_SOCKET_ID;
     }
 
     public void start(){
@@ -83,7 +84,7 @@ public final class SocketProcessor {
 
     public void onSocketExit(int exit_code){
         close();
-        System.out.println("client mSocketId " + mSocketId);
+        System.out.println(TAG + "onSocketExit mSocketId " + mSocketId + " exit_code " + exit_code);
         if(null != mNioConnectListener){
             mNioConnectListener.onConnectFailed(SocketProcessor.this);
         }
@@ -160,7 +161,7 @@ public final class SocketProcessor {
                         break;
                     }
 
-                    if(!mClient.mWriteMessageQueen.mMessageQueen.isEmpty()) {
+                    if(!mClient.mWriteMessageQueen.mWriteQueen.isEmpty()) {
                         SelectionKey key= mSocketChannel.keyFor(mSelector);
                         key.interestOps(SelectionKey.OP_WRITE);
                     }

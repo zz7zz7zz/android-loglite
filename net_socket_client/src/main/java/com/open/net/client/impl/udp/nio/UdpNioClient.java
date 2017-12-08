@@ -1,5 +1,6 @@
 package com.open.net.client.impl.udp.nio;
 
+import com.open.net.client.GClient;
 import com.open.net.client.structures.BaseClient;
 import com.open.net.client.structures.BaseMessageProcessor;
 import com.open.net.client.structures.IConnectListener;
@@ -13,19 +14,37 @@ import java.nio.channels.DatagramChannel;
 /**
  * author       :   long
  * created on   :   2017/11/30
- * description  :   NioClient
+ * description  :   TcpNioClient
  */
 
 public final class UdpNioClient extends BaseClient {
 
-    private final String TAG="NioClient";
+    static {
+        GClient.init();
+    }
 
-    //-------------------------------------------------------------------------------------------
     private UdpNioConnector mConnector;
 
     public UdpNioClient(BaseMessageProcessor mMessageProcessor, IConnectListener mConnectListener) {
         super(mMessageProcessor);
         mConnector = new UdpNioConnector(this,mConnectListener);
+    }
+
+    //-------------------------------------------------------------------------------------------
+    public void setConnectAddress(UdpAddress[] tcpArray ){
+        mConnector.setConnectAddress(tcpArray);
+    }
+
+    public void connect(){
+        mConnector.connect();
+    }
+
+    public void disconnect(){
+        mConnector.disconnect();
+    }
+
+    public void reconnect(){
+        mConnector.reconnect();
     }
 
     //-------------------------------------------------------------------------------------------
@@ -154,26 +173,5 @@ public final class UdpNioClient extends BaseClient {
         }
 
         return writeRet;
-    }
-
-    //-------------------------------------------------------------------------------------------
-    public void setConnectAddress(UdpAddress[] tcpArray ){
-        mConnector.setConnectAddress(tcpArray);
-    }
-
-    public void setConnectTimeout(long connect_timeout ){
-        mConnector.setConnectTimeout(connect_timeout);
-    }
-
-    public void connect(){
-        mConnector.connect();
-    }
-
-    public void disconnect(){
-        mConnector.disconnect();
-    }
-
-    public void reconnect(){
-        mConnector.reconnect();
     }
 }
