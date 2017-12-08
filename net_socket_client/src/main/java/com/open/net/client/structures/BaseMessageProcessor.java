@@ -27,8 +27,8 @@ public abstract class BaseMessageProcessor {
     }
 
     public final void onReceiveMessages(BaseClient mClient){
-        if(mClient.mReadMessageQueen.mQueen.size()>0){
-            onReceiveMessages(mClient,mClient.mReadMessageQueen.mQueen);
+        if(mClient.mReadMessageQueen.mMessageQueen.size()>0){
+            onReceiveMessages(mClient,mClient.mReadMessageQueen.mMessageQueen);
             mClient.onReceiveMessageClear();
         }
     }

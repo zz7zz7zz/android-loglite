@@ -36,26 +36,26 @@ public abstract class BaseClient {
     //--------------------------------------------------------------------------------------
     public void onReceiveData(byte[] src , int offset , int length){
         Message msg = mReadMessageQueen.build(src,offset,length);
-        mReadMessageQueen.put(msg);
+        mReadMessageQueen.add(msg);
     }
 
     public void onReceiveMessageClear(){
-        Message msg = mReadMessageQueen.mQueen.poll();
+        Message msg = mReadMessageQueen.mMessageQueen.poll();
         while (null != msg){
             mReadMessageQueen.remove(msg);
-            msg = mReadMessageQueen.mQueen.poll();
+            msg = mReadMessageQueen.mMessageQueen.poll();
         }
     }
 
     //--------------------------------------------------------------------------------------
     public void onSendMessage(byte[] src , int offset , int length) {
         Message msg = mWriteMessageQueen.build(src,offset,length);
-        mWriteMessageQueen.put(msg);
+        mWriteMessageQueen.add(msg);
         onCheckConnect();
     }
 
     protected Message pollWriteMessage(){
-        return mWriteMessageQueen.mQueen.poll();
+        return mWriteMessageQueen.mMessageQueen.poll();
     }
 
     protected void removeWriteMessage(Message msg){
