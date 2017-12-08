@@ -25,11 +25,11 @@ public final class Logger{
     private ArrayList<ILog> mLoggerList = new ArrayList<>();
     private static Logger mLogger;
     private static LogConfig mLogConfig;
-    private static boolean isInited = false;
+    private static boolean isInitialized = false;
 
     //------------------------------------------
     public static LogConfig init(Context mContext, String assetFileName, String fileLogPath){
-        if(!isInited){
+        if(!isInitialized){
             mLogConfig = LogConfig.parse(mContext,assetFileName);
             if(null != mLogConfig){
                 if(mLogConfig.isEnable) {
@@ -59,7 +59,7 @@ public final class Logger{
             } else{
                 destroy();
             }
-            isInited = true;
+            isInitialized = true;
         }else{
             //有可能有网络连接，再次初始化一次
             if(null != mLogger){
@@ -70,7 +70,7 @@ public final class Logger{
     }
 
     public static LogConfig updateConfig(Context mContext, String assetFileName, String fileLogPath){
-        isInited = false;
+        isInitialized = false;
         return init(mContext,assetFileName,fileLogPath);
     }
 
@@ -80,7 +80,7 @@ public final class Logger{
         }
         mLogConfig = null;
         mLogger = null;
-        isInited = false;
+        isInitialized = false;
     }
 
     //------------------------------------------
