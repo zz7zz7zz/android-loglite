@@ -32,9 +32,9 @@ android-loglite是一个轻量级的用于android上的日志打印库，打印�
     console_log_type = 2                                    #终端输出类型    SYSTEM = 1; LOGCAT = 2;
     
     [File]
-    file_name_formater=yyyy-MM-dd_%d                        #文件名格式化2017-1-1_1.txt
-    file_size = 52428800                                    #一个日志文件的最大值;长度单位是byte ，所以1M的长度是1024*1024
-    file_syn  = true                                        #true 表示异步写，false表示同步写
+     file_name_formater=yyyy-MM-dd_%d                        #文件名格式化2017-1-1_1.txt
+     file_size = 52428800                                    #一个日志文件的最大值;长度单位是byte ，所以1M的长度是1024*1024
+     file_syn  = true                                        #true 表示异步写，false表示同步写
     
     [Net]
     net_tcp=[192.168.123.1:9999,192.168.123.1:9998]         #tcp配置
