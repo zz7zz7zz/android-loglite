@@ -33,7 +33,7 @@ android-loglite是一个轻量级的用于android上的日志打印库，打印�
     
     [File]
     file_name_formater=yyyy-MM-dd_%d                        #文件名格式化2017-1-1_1.txt
-    file_size = 52428800                                    #一个日志文件的最大值;长度单位是byte ，所以1M的长度是1024*1024, 52428800(50M)
+    file_size = 52428800                                    #一个日志文件的最大值;长度单位是byte ，所以1M的长度是1024*104
     file_syn  = true                                        #true 表示异步写，false表示同步写
     
     [Net]
