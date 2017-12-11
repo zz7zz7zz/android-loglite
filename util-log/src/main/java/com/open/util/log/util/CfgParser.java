@@ -1,6 +1,5 @@
 package com.open.util.log.util;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
@@ -19,16 +18,6 @@ import java.util.regex.Pattern;
 public final class CfgParser {
 
     //----------------------------------------------------------------
-    public static HashMap<String,Object> parseToMap(Context mContext , String android_asset_filename) {
-        HashMap<String,Object> ret = null;
-        try {
-            ret = parseToMap(mContext.getAssets().open(android_asset_filename));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ret;
-    }
-
     public static HashMap<String,Object> parseToMap(String config_file_path){
         try {
             return parseToMap(new FileInputStream(config_file_path));

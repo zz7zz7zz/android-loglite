@@ -1,7 +1,5 @@
 package com.open.util.log.base;
 
-import android.content.Context;
-
 import com.open.net.client.structures.TcpAddress;
 import com.open.net.client.structures.UdpAddress;
 import com.open.util.log.util.CfgParser;
@@ -108,8 +106,7 @@ public final class LogConfig {
     public TcpAddress[] net_tcp;
     public UdpAddress[] net_udp;
 
-    public static LogConfig parse(Context mContext , String assetFileName) {
-        HashMap<String,Object> ret = CfgParser.parseToMap(mContext,assetFileName);
+    public static LogConfig parse(HashMap<String,Object> ret) {
         LogConfig mLogConfig = new LogConfig();
         mLogConfig.init(ret);
         return mLogConfig;

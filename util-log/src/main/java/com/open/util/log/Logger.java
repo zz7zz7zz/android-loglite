@@ -10,10 +10,13 @@ import com.open.util.log.impl.console.ConsLogger;
 import com.open.util.log.impl.file.FileLogger;
 import com.open.util.log.impl.net.TcpLogger;
 import com.open.util.log.impl.net.UdpLogger;
+import com.open.util.log.util.CfgParser;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -28,9 +31,56 @@ public final class Logger{
     private static boolean isInitialized = false;
 
     //------------------------------------------
-    public static LogConfig init(Context mContext, String assetFileName, String fileLogPath){
+    public static LogConfig init(Context mContext, String android_asset_filename, String fileLogPath){
         if(!isInitialized){
-            mLogConfig = LogConfig.parse(mContext,assetFileName);
+            try {
+                InputStream mInputStream = mContext.getAssets().open(android_asset_filename);
+                mLogConfig = LogConfig.parse(CfgParser.parseToMap(mInputStream));
+                if(null != mLogConfig){
+                    if(mLogConfig.isEnable) {
+                        mLogger = new Logger();
+
+                        if((mLogConfig.common_mode & LogConfig.LOG_MODE_CONSOLE) == LogConfig.LOG_MODE_CONSOLE){
+                            mLogger.addLogger(new ConsLogger(mLogConfig.console_log_type));
+                        }
+
+                        if((mLogConfig.common_mode & LogConfig.LOG_MODE_FILE) == LogConfig.LOG_MODE_FILE){
+                            mLogger.addLogger(new FileLogger(fileLogPath,mLogConfig.file_name_formater,mLogConfig.file_size,mLogConfig.file_syn));
+                        }
+
+                        if((mLogConfig.common_mode & LogConfig.LOG_MODE_NET_TCP) == LogConfig.LOG_MODE_NET_TCP){
+                            mLogger.addLogger(new TcpLogger(mLogConfig.net_tcp));
+                        }
+
+                        if((mLogConfig.common_mode & LogConfig.LOG_MODE_NET_UDP) == LogConfig.LOG_MODE_NET_UDP){
+                            mLogger.addLogger(new UdpLogger(mLogConfig.net_udp));
+                        }
+
+                        mLogger.start();
+
+                    }else{
+                        destroy();
+                    }
+                } else{
+                    destroy();
+                }
+                isInitialized = true;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            //有可能有网络连接，再次初始化一次
+            if(null != mLogger){
+                mLogger.start();
+            }
+        }
+        return mLogConfig;
+    }
+
+    public static LogConfig init(String config_file_path, String fileLogPath){
+        if(!isInitialized){
+            mLogConfig = LogConfig.parse(CfgParser.parseToMap(config_file_path));
             if(null != mLogConfig){
                 if(mLogConfig.isEnable) {
                     mLogger = new Logger();
@@ -69,9 +119,9 @@ public final class Logger{
         return mLogConfig;
     }
 
-    public static LogConfig updateConfig(Context mContext, String assetFileName, String fileLogPath){
-        isInitialized = false;
-        return init(mContext,assetFileName,fileLogPath);
+    public static LogConfig updateConfig(String config_file_path, String fileLogPath){
+        destroy();
+        return init(config_file_path,fileLogPath);
     }
 
     public static void destroy(){
