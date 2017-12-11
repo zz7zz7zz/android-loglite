@@ -102,6 +102,108 @@ public final class Logger{
     }
 
     //------------------------------------------
+    public static void v(String author , String tag , String... kv) {
+        if(null == mLogger || kv.length == 0 || null == mLogConfig ||!mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_VERBOSE)){
+            return;
+        }
+
+        String trace = null;
+        if(mLogConfig.isCanFormatTag()){
+            String [] names = new String[6];
+            if(fillTraceNames(names)){
+                trace = mLogConfig.getTraceInfo(names);
+            }
+        }
+
+        String[] logKv = kv;
+        int size = mLogger.mLoggerList.size();
+        for (int i = 0; i < size; i++) {
+            mLogger.mLoggerList.get(i).v(LogConfig.LOG_LEVEL_VERBOSE,tag,trace,logKv);
+        }
+    }
+
+    public static void d(String author , String tag  , String... kv) {
+        if(null == mLogger || kv.length == 0 || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_DEBUG)){
+            return;
+        }
+
+        String trace = null;
+        if(mLogConfig.isCanFormatTag()){
+            String [] names = new String[6];
+            if(fillTraceNames(names)){
+                trace = mLogConfig.getTraceInfo(names);
+            }
+        }
+
+        String[] logKv = kv;
+        int size = mLogger.mLoggerList.size();
+        for (int i = 0; i < size; i++) {
+            mLogger.mLoggerList.get(i).d(LogConfig.LOG_LEVEL_DEBUG,tag,trace,logKv);
+        }
+    }
+
+    public static void i(String author  , String tag , String... kv) {
+        if(null == mLogger || kv.length == 0 || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_INFO)){
+            return;
+        }
+
+        String trace = null;
+        if(mLogConfig.isCanFormatTag()){
+            String [] names = new String[6];
+            if(fillTraceNames(names)){
+                trace = mLogConfig.getTraceInfo(names);
+            }
+        }
+
+        String[] logKv = kv;
+        int size = mLogger.mLoggerList.size();
+        for (int i = 0; i < size; i++) {
+            mLogger.mLoggerList.get(i).i(LogConfig.LOG_LEVEL_INFO,tag,trace,logKv);
+        }
+    }
+
+    public static void w(String author , String tag  , String... kv) {
+        if(null == mLogger || kv.length == 0 || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_WARN)){
+            return;
+        }
+
+        String trace = null;
+        if(mLogConfig.isCanFormatTag()){
+            String [] names = new String[6];
+            if(fillTraceNames(names)){
+                trace = mLogConfig.getTraceInfo(names);
+            }
+        }
+
+        String[] logKv = kv;
+        int size = mLogger.mLoggerList.size();
+        for (int i = 0; i < size; i++) {
+            mLogger.mLoggerList.get(i).w(LogConfig.LOG_LEVEL_WARN,tag,trace,logKv);
+        }
+    }
+
+    public static  void e(String author  , String tag , String... kv) {
+        if(null == mLogger || kv.length == 0 || null == mLogConfig || !mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_ERROR)){
+            return;
+        }
+
+        String trace = null;
+        if(mLogConfig.isCanFormatTag()){
+            String [] names = new String[6];
+            if(fillTraceNames(names)){
+                trace = mLogConfig.getTraceInfo(names);
+            }
+        }
+
+        String[] logKv = kv;
+        int size = mLogger.mLoggerList.size();
+        for (int i = 0; i < size; i++) {
+            mLogger.mLoggerList.get(i).e(LogConfig.LOG_LEVEL_ERROR,tag,trace,logKv);
+        }
+    }
+
+    //------------------------------------------
+
     public static void v(String author , String tag , Object... kv) {
         if(null == mLogger || kv.length == 0 || null == mLogConfig ||!mLogConfig.isPermit(author, LogConfig.LOG_LEVEL_VERBOSE)){
             return;
@@ -202,6 +304,7 @@ public final class Logger{
         }
     }
 
+    //------------------------------------------
     private static boolean fillTraceNames(String[] names){
         StackTraceElement[] sts = Thread.currentThread().getStackTrace();
         if (sts != null) {

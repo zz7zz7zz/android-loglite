@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,18 +19,26 @@ import java.util.regex.Pattern;
 public final class CfgParser {
 
     //----------------------------------------------------------------
-
-    public static HashMap<String,Object> parseToMap(Context mContext , String assetFileName) {
+    public static HashMap<String,Object> parseToMap(Context mContext , String android_asset_filename) {
         HashMap<String,Object> ret = null;
         try {
-            ret = parseToMap(mContext.getAssets().open(assetFileName));
+            ret = parseToMap(mContext.getAssets().open(android_asset_filename));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return ret;
     }
 
-    private static HashMap<String,Object> parseToMap(InputStream mInputStream) {
+    public static HashMap<String,Object> parseToMap(String config_file_path){
+        try {
+            return parseToMap(new FileInputStream(config_file_path));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static HashMap<String,Object> parseToMap(InputStream mInputStream) {
         HashMap<String,Object> ret = new HashMap<>();
         InputStreamReader inputReader = null;
         BufferedReader bufReader = null;

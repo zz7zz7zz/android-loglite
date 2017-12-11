@@ -10,6 +10,9 @@ import android.view.View;
 import com.open.util.log.Logger;
 import com.open.util.log.base.LogConfig;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 
 public class MainActivity extends Activity {
@@ -22,26 +25,30 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         LogConfig mConfig = Logger.init(this,"log_config",getDiskCacheDir(this));
+
+        System.out.println("-------------------------------");
         System.out.println(mConfig);
+        System.out.println("-------------------------------");
 
         findViewById(R.id.log_text).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 //-------------------------1.测试字符串-------------------------------
-                Logger.v("A",TAG,"onCreate " + (++count));
-                Logger.v("C",TAG,"onCreate " + (++count));
-                Logger.d("A",TAG,"onCreate " + (++count));
+                Logger.v(LogAutor.AUTHOR_A,TAG,"onCreate " + (++count));
+//                Logger.v(LogAutor.AUTHOR_B,TAG,"onCreate " + (++count));
+//                Logger.d(LogAutor.AUTHOR_C,TAG,"onCreate " + (++count));
+
 //                //-------------------------2.测试JSON对象-------------------------------
-//                try {
-//                    JSONObject mJSONObject = new JSONObject();
-//                    mJSONObject.put("name","yang");
-//                    mJSONObject.put("age",18);
-//
-//                    Logger.v("A",TAG,mJSONObject);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    JSONObject mJSONObject = new JSONObject();
+                    mJSONObject.put("name","yang");
+                    mJSONObject.put("age",18);
+
+                    Logger.v(LogAutor.AUTHOR_A,TAG,mJSONObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 //
 //                //-------------------------3.测试JSON数组-------------------------------
 //                try {
@@ -53,7 +60,7 @@ public class MainActivity extends Activity {
 //                        mJSONArray.put(mJSONObject);
 //                    }
 //
-//                    Logger.v("A",TAG,mJSONArray);
+//                    Logger.v(LogAutor.AUTHOR_A,TAG,mJSONArray);
 //                } catch (JSONException e) {
 //                    e.printStackTrace();
 //                }
@@ -64,16 +71,16 @@ public class MainActivity extends Activity {
 //                    str.equals("null");
 //                } catch (Exception e) {
 ////                    e.printStackTrace();
-//                    Logger.v("A",TAG,e);
+//                    Logger.v(LogAutor.AUTHOR_A,TAG,e);
 //                }
 
-//                Logger.v("C",TAG,"onCreate " + (++count));
+//                Logger.v(LogAutor.AUTHOR_A,TAG,"onCreate " + (++count));
 
 //                new Thread(new Runnable() {
 //                    @Override
 //                    public void run() {
-//                        Logger.v("B",TAG,"Thread run " + (++count));
-//                        Logger.v("D",TAG,"Thread run " + (++count));
+//                        Logger.v(LogAutor.AUTHOR_A,TAG,"Thread run " + (++count));
+//                        Logger.v(LogAutor.AUTHOR_A,TAG,"Thread run " + (++count));
 //                    }
 //                }).start();
 
@@ -87,7 +94,7 @@ public class MainActivity extends Activity {
 ////        System.out.println("---- len " + len);
 ////        System.out.println(str);
 //
-//                Logger.v("A",TAG,str);
+//                Logger.v(LogAutor.AUTHOR_A,TAG,str);
 
             }
         });
