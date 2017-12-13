@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LogConfig mConfig = Logger.init(this,"log_config",getDiskCacheDir(this));
+        LogConfig mConfig = Logger.init(this, "log.config",getDiskCacheDir(this));
 
         System.out.println("-------------------------------");
         System.out.println(mConfig);
