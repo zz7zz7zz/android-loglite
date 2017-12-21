@@ -1,6 +1,6 @@
 package com.open.util.log.impl.net;
 
-import com.open.net.client.impl.tcp.nio.TcpNioClient;
+import com.open.net.client.impl.tcp.nio.NioClient;
 import com.open.net.client.structures.BaseClient;
 import com.open.net.client.structures.BaseMessageProcessor;
 import com.open.net.client.structures.TcpAddress;
@@ -55,7 +55,7 @@ public final class TcpLogger implements ILog {
 
     //------------------------------------------------------------
     private StringBuilder builder = new StringBuilder(LOGGER_ENTRY_MAX_LEN_FIX/2);
-    private TcpNioClient mNioClient ;
+    private NioClient mNioClient ;
 
 
     private BaseMessageProcessor mMessageProcessor =new BaseMessageProcessor() {
@@ -67,7 +67,7 @@ public final class TcpLogger implements ILog {
     };
 
     public TcpLogger(TcpAddress[] tcpArray) {
-        mNioClient = new TcpNioClient(mMessageProcessor,null);
+        mNioClient = new NioClient(mMessageProcessor,null);
         mNioClient.setConnectAddress(tcpArray);
     }
 
