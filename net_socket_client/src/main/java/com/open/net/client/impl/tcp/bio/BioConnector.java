@@ -1,6 +1,6 @@
 package com.open.net.client.impl.tcp.bio;
 
-import com.open.net.client.impl.tcp.bio.processor.SocketProcessor;
+import com.open.net.client.impl.tcp.bio.processor.BioReadWriteProcessor;
 import com.open.net.client.structures.IConnectListener;
 import com.open.net.client.structures.TcpAddress;
 
@@ -14,7 +14,7 @@ import java.io.OutputStream;
  * description  :   连接器
  */
 
-public class TcpBioConnector {
+public class BioConnector {
 
     private final int STATE_CLOSE			= 0x1;//连接关闭
     private final int STATE_CONNECT_START	= 0x2;//连接开始
@@ -25,49 +25,49 @@ public class TcpBioConnector {
     private int             mConnectIndex = -1;
     private int             state = STATE_CLOSE;
 
-    private TcpBioClient        mClient;
+    private BioClient mClient;
     private IConnectListener    mIConnectListener;
-    private SocketProcessor     mSocketProcessor;
+    private BioReadWriteProcessor mSocketProcessor;
 
-    private ITcpBioConnectListener mProxyConnectStatusListener = new ITcpBioConnectListener() {
+    private BioConnectListener mProxyConnectStatusListener = new BioConnectListener() {
         @Override
-        public synchronized void onConnectSuccess(SocketProcessor mSocketProcessor , OutputStream mOutputStream , InputStream mInputStream) throws IOException {
-            if(mSocketProcessor != TcpBioConnector.this.mSocketProcessor){//两个请求都不是同一个，说明是之前连接了，现在重连了
-                SocketProcessor dropProcessor = mSocketProcessor;
+        public synchronized void onConnectSuccess(BioReadWriteProcessor mSocketProcessor , OutputStream mOutputStream , InputStream mInputStream) throws IOException {
+            if(mSocketProcessor != BioConnector.this.mSocketProcessor){//两个请求都不是同一个，说明是之前连接了，现在重连了
+                BioReadWriteProcessor dropProcessor = mSocketProcessor;
                 if(null != dropProcessor){
                     dropProcessor.close();
                 }
                 return;
-            }
-
-            if(null != mIConnectListener ){
-                mIConnectListener.onConnectionSuccess();
             }
 
             state = STATE_CONNECT_SUCCESS;
             mClient.init(mOutputStream, mInputStream);
+            
+            if(null != mIConnectListener ){
+                mIConnectListener.onConnectionSuccess();
+            }
         }
 
         @Override
-        public synchronized void onConnectFailed(SocketProcessor mSocketProcessor) {
-            if(mSocketProcessor != TcpBioConnector.this.mSocketProcessor){//两个请求都不是同一个，说明是之前连接了，现在重连了
-                SocketProcessor dropProcessor = mSocketProcessor;
+        public synchronized void onConnectFailed(BioReadWriteProcessor mSocketProcessor) {
+            if(mSocketProcessor != BioConnector.this.mSocketProcessor){//两个请求都不是同一个，说明是之前连接了，现在重连了
+                BioReadWriteProcessor dropProcessor = mSocketProcessor;
                 if(null != dropProcessor){
                     dropProcessor.close();
                 }
                 return;
             }
 
-            if(null != mIConnectListener ){
-                mIConnectListener.onConnectionFailed();
-            }
-
             state = STATE_CLOSE;
             connect();//try to connect next ip port
+            
+//            if(null != mIConnectListener ){
+//                mIConnectListener.onConnectionFailed();
+//            }
         }
     };
 
-    public TcpBioConnector(TcpBioClient mClient , IConnectListener mIConnectListener) {
+    public BioConnector(BioClient mClient , IConnectListener mIConnectListener) {
         this.mClient = mClient;
         this.mIConnectListener = mIConnectListener;
     }
@@ -138,13 +138,14 @@ public class TcpBioConnector {
         mConnectIndex++;
         if(mConnectIndex < mAddress.length && mConnectIndex >= 0){
             state = STATE_CONNECT_START;
-            mSocketProcessor = new SocketProcessor(mAddress[mConnectIndex].ip, mAddress[mConnectIndex].port, connect_timeout,mClient, mProxyConnectStatusListener);
+            mSocketProcessor = new BioReadWriteProcessor(mAddress[mConnectIndex].ip, mAddress[mConnectIndex].port, connect_timeout,mClient, mProxyConnectStatusListener);
             mSocketProcessor.start();
         }else{
             mConnectIndex = -1;
-
-            //循环连接了一遍还没有连接上，说明网络连接不成功，此时清空消息队列，防止消息堆积
-            mClient.clearUnreachableMessages();
+            
+	        if(null != mIConnectListener ){
+	        	mIConnectListener.onConnectionFailed();
+	        }
         }
     }
 

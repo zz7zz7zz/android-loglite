@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LogConfig mConfig = Logger.init(this,"log_config",getDiskCacheDir(this));
+        LogConfig mConfig = Logger.init(this, "log.config",getDiskCacheDir(this));
 
         System.out.println("-------------------------------");
         System.out.println(mConfig);
@@ -35,9 +35,11 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
 
                 //-------------------------1.测试字符串-------------------------------
-                Logger.v(LogAutor.AUTHOR_A,TAG,"onCreate " + (++count));
-//                Logger.v(LogAutor.AUTHOR_B,TAG,"onCreate " + (++count));
-//                Logger.d(LogAutor.AUTHOR_C,TAG,"onCreate " + (++count));
+                Logger.v("onCreate A " + (++count));//强制写
+                Logger.vt(TAG,"onCreate B " + (++count));//强制写
+                Logger.vat(LogAutor.AUTHOR_A,TAG,"onCreate C " + (++count));
+//                Logger.vat(LogAutor.AUTHOR_B,TAG,"onCreate " + (++count));
+//                Logger.vatd(LogAutor.AUTHOR_C,TAG,"onCreate " + (++count));
 
 //                //-------------------------2.测试JSON对象-------------------------------
                 try {
@@ -45,7 +47,7 @@ public class MainActivity extends Activity {
                     mJSONObject.put("name","yang");
                     mJSONObject.put("age",18);
 
-                    Logger.v(LogAutor.AUTHOR_A,TAG,mJSONObject);
+                    Logger.vat(LogAutor.AUTHOR_A,TAG,mJSONObject);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

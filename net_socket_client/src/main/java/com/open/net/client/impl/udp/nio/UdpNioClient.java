@@ -14,7 +14,7 @@ import java.nio.channels.DatagramChannel;
 /**
  * author       :   long
  * created on   :   2017/11/30
- * description  :   TcpNioClient
+ * description  :   UdpNioClient
  */
 
 public final class UdpNioClient extends BaseClient {
@@ -92,7 +92,7 @@ public final class UdpNioClient extends BaseClient {
             readRet = false;
         }
 
-        mMessageProcessor.onReceiveMessages(this);
+        mMessageProcessor.onReceiveDataCompleted(this);
         //退出客户端的时候需要把要写给该客户端的数据清空
         if(!readRet){
             Message msg = pollWriteMessage();

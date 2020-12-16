@@ -1,6 +1,6 @@
 package com.open.net.client.impl.udp.nio;
 
-import com.open.net.client.impl.udp.nio.processor.SocketProcessor;
+import com.open.net.client.impl.udp.nio.processor.UdpNioReadWriteProcessor;
 import com.open.net.client.structures.IConnectListener;
 import com.open.net.client.structures.UdpAddress;
 
@@ -25,43 +25,43 @@ public final class UdpNioConnector {
 
     private UdpNioClient      mClient;
     private IConnectListener  mIConnectListener;
-    private SocketProcessor   mSocketProcessor;
+    private UdpNioReadWriteProcessor mSocketProcessor;
 
-    private IUdpNioConnectListener mProxyConnectStatusListener = new IUdpNioConnectListener() {
+    private UdpNioConnectListener mProxyConnectStatusListener = new UdpNioConnectListener() {
         @Override
-        public synchronized void onConnectSuccess(SocketProcessor mSocketProcessor, DatagramChannel socketChannel) throws IOException {
+        public synchronized void onConnectSuccess(UdpNioReadWriteProcessor mSocketProcessor, DatagramChannel socketChannel) throws IOException {
             if(mSocketProcessor != UdpNioConnector.this.mSocketProcessor){//两个请求都不是同一个，说明是之前连接了，现在重连了
-                SocketProcessor dropProcessor = mSocketProcessor;
+                UdpNioReadWriteProcessor dropProcessor = mSocketProcessor;
                 if(null != dropProcessor){
                     dropProcessor.close();
                 }
                 return;
-            }
-
-            if(null != mIConnectListener ){
-                mIConnectListener.onConnectionSuccess();
             }
 
             state = STATE_CONNECT_SUCCESS;
             mClient.init(socketChannel);
+            
+            if(null != mIConnectListener ){
+                mIConnectListener.onConnectionSuccess();
+            }
         }
 
         @Override
-        public synchronized void onConnectFailed(SocketProcessor mSocketProcessor) {
+        public synchronized void onConnectFailed(UdpNioReadWriteProcessor mSocketProcessor) {
             if(mSocketProcessor != UdpNioConnector.this.mSocketProcessor){//两个请求都不是同一个，说明是之前连接了，现在重连了
-                SocketProcessor dropProcessor = mSocketProcessor;
+                UdpNioReadWriteProcessor dropProcessor = mSocketProcessor;
                 if(null != dropProcessor){
                     dropProcessor.close();
                 }
                 return;
             }
 
-            if(null !=mIConnectListener ){
-                mIConnectListener.onConnectionFailed();
-            }
-
             state = STATE_CLOSE;
             connect();//try to connect next ip port
+            
+//            if(null !=mIConnectListener ){
+//                mIConnectListener.onConnectionFailed();
+//            }
         }
     };
 
@@ -132,13 +132,14 @@ public final class UdpNioConnector {
         mConnectIndex++;
         if(mConnectIndex < mAddress.length && mConnectIndex >= 0){
             state = STATE_CONNECT_START;
-            mSocketProcessor = new SocketProcessor(mAddress[mConnectIndex].ip, mAddress[mConnectIndex].port,mClient,mProxyConnectStatusListener);
+            mSocketProcessor = new UdpNioReadWriteProcessor(mAddress[mConnectIndex].ip, mAddress[mConnectIndex].port,mClient,mProxyConnectStatusListener);
             mSocketProcessor.start();
         }else{
             mConnectIndex = -1;
 
-            //循环连接了一遍还没有连接上，说明网络连接不成功，此时清空消息队列，防止队列堆积
-            mClient.clearUnreachableMessages();
+            if(null !=mIConnectListener ){
+                mIConnectListener.onConnectionFailed();
+            }
         }
     }
 

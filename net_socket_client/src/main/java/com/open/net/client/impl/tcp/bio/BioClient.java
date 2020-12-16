@@ -15,20 +15,20 @@ import java.net.SocketException;
 /**
  * author       :   long
  * created on   :   2017/11/30
- * description  :   TcpBioClient
+ * description  :   BioClient
  */
-public class TcpBioClient extends BaseClient{
+public class BioClient extends BaseClient{
 
 	static {
 		GClient.init();
 	}
 
 	//-------------------------------------------------------------------------------------------
-	private TcpBioConnector mConnector;
+	private BioConnector mConnector;
 
-	public TcpBioClient(BaseMessageProcessor mMessageProcessor, IConnectListener mConnectListener) {
+	public BioClient(BaseMessageProcessor mMessageProcessor, IConnectListener mConnectListener) {
 		super(mMessageProcessor);
-		mConnector = new TcpBioConnector(this,mConnectListener);
+		mConnector = new BioConnector(this,mConnectListener);
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ public class TcpBioClient extends BaseClient{
 				if(numRead > 0){
 					if(null != mMessageProcessor) {
 						mMessageProcessor.onReceiveData(this, bodyBytes,0,numRead);
-						mMessageProcessor.onReceiveMessages(this);
+						mMessageProcessor.onReceiveDataCompleted(this);
 					}
 				}
 			}
@@ -98,7 +98,7 @@ public class TcpBioClient extends BaseClient{
 		}
 
 		if(null != mMessageProcessor){
-			mMessageProcessor.onReceiveMessages(this);
+			mMessageProcessor.onReceiveDataCompleted(this);
 		}
 
 		//退出客户端的时候需要把要该客户端要写出去的数据清空
